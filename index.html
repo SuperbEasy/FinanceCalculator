@@ -26,8 +26,9 @@ input[type=range]{width:100%;accent-color:var(--p);margin:5px 0;cursor:pointer}
 table{width:100%;border-collapse:collapse;font-size:1.1vh}
 th{position:sticky;top:0;background:#21262d;padding:10px;text-align:left;color:var(--p)}
 td{padding:10px;border-bottom:1px solid #30363d}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto}
+.grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:8px;margin-top:auto}
 .stat{background:rgba(255,255,255,0.02);padding:10px;border-radius:12px;text-align:center;border:1px solid #30363d}
+.stat.full{grid-column: span 2}
 .stat span{font-size:1.4vh;font-weight:700;display:block;margin-top:2px}
 .cur-wrap{grid-column:1/-1;display:flex;justify-content:center;gap:15px;margin:10px 0}
 .cur-wrap label{font-size:1vh;padding:5px 12px;background:#161b22;border-radius:8px;cursor:pointer;border:1px solid #30363d}
@@ -55,7 +56,7 @@ hr{border:0;border-top:1px solid #30363d;margin:15px 0 10px}
     <div class="panel">
         <div class="tabs">
             <button class="tab active" data-v="c0">Visual</button>
-            <button class="tab" data-v="c1">Table</button>
+            <button class="tab" data-v="c1">Yearly Table</button>
             <button class="tab" data-v="c2">Growth</button>
             <button class="tab" data-v="c3">Maturity Analysis</button>
         </div>
@@ -72,14 +73,14 @@ hr{border:0;border-top:1px solid #30363d;margin:15px 0 10px}
         </div>
 
         <div id="c2" class="view"><canvas id="chtL"></canvas></div>
-
         <div id="c3" class="view"><canvas id="chtB"></canvas></div>
 
         <div class="grid">
             <div class="stat">Total Invested<span id="ri" style="color:var(--s)">0</span></div>
-            <div class="stat">Net Profit<span id="rg" style="color:var(--p)">0</span></div>
-            <div class="stat">Tax Amount<span id="rx" style="color:var(--t)">0</span></div>
-            <div class="stat">Gross Value<span id="rs">0</span></div>
+            <div class="stat">Net Profit (SIP)<span id="rg" style="color:var(--p)">0</span></div>
+            <div class="stat">Accumulation Gain<span id="rag" style="color:var(--t)">0</span></div>
+            <div class="stat">Estimated Tax<span id="rx" style="color:#ff4d4d">0</span></div>
+            <div class="stat full">Final Gross Maturity<span id="rs">0</span></div>
         </div>
     </div>
 
@@ -89,10 +90,8 @@ hr{border:0;border-top:1px solid #30363d;margin:15px 0 10px}
         <label><input type="radio" name="c" value="€"><span>€ EUR</span></label>
     </div>
 
-    <footer>DISCLAIMER: For educational use. Mathematical fact-based projections.</footer>
+    <footer>DISCLAIMER: For educational use only. Calculations based on user-defined growth rates.</footer>
 </div>
-
-
 
 <script>
 const _=id=>document.getElementById(id); let cD, cL, cB;
@@ -104,6 +103,7 @@ const run=()=>{
     
     let h='', labs=[], dI=[], dV=[];
     let currentWealth = 0;
+    let wealthAtEndOfSIP = 0;
     const totalYears = ySIP + yAcc;
 
     for(let i=1; i<=totalYears; i++){
@@ -111,6 +111,7 @@ const run=()=>{
             let n = i * 12;
             currentWealth = m * ((Math.pow(1+r,n)-1)/r) * (1+r);
             dI.push(m * n);
+            if(i == ySIP) wealthAtEndOfSIP = currentWealth;
         } else {
             currentWealth = currentWealth * Math.pow(1+r, 12);
             dI.push(m * ySIP * 12);
@@ -121,31 +122,43 @@ const run=()=>{
         labs.push('Y'+i); dV.push(Math.round(currentWealth));
     }
 
-    const invT = m * ySIP * 12, lastV = dV[totalYears-1] || 0, gain = lastV - invT, tax = gain * tx, net = lastV - tax;
+    const invT = m * ySIP * 12;
+    const lastV = dV[totalYears-1] || 0;
+    
+    // Logic for new boxes
+    const netProfitSIP = wealthAtEndOfSIP - invT;
+    const accumulationGain = lastV - wealthAtEndOfSIP;
+    const totalGain = lastV - invT;
+    const tax = totalGain * tx;
+    const netRedemption = lastV - tax;
 
     _('v1').innerText=f(m); _('v2').innerText=_('i2').value+'%'; _('v3').innerText=ySIP+'Y'; 
     _('vWait').innerText=yAcc+'Y'; _('v4').innerText=_('i4').value+'%';
-    _('rt').innerText=f(net); _('ri').innerText=f(invT); _('rg').innerText=f(gain-tax); _('rx').innerText=f(tax); _('rs').innerText=f(lastV);
+    
+    _('rt').innerText=f(netRedemption); 
+    _('ri').innerText=f(invT); 
+    _('rg').innerText=f(netProfitSIP); 
+    _('rag').innerText=f(accumulationGain);
+    _('rx').innerText=f(tax); 
+    _('rs').innerText=f(lastV);
+    
     _('tb').innerHTML=h;
 
-    // 1. Donut
     if(cD)cD.destroy();
-    cD=new Chart(_('chtD'),{type:'doughnut',data:{datasets:[{data:[invT,gain-tax,tax],backgroundColor:['#3b82f6','#10b981','#f59e0b'],borderWidth:0}]},options:{cutout:'90%',plugins:{legend:{display:false}}}});
+    cD=new Chart(_('chtD'),{type:'doughnut',data:{datasets:[{data:[invT, totalGain - tax, tax],backgroundColor:['#3b82f6','#10b981','#f59e0b'],borderWidth:0}]},options:{cutout:'90%',plugins:{legend:{display:false}}}});
 
-    // 2. Line
     if(cL)cL.destroy();
     cL=new Chart(_('chtL'),{type:'line',data:{labels:labs,datasets:[{data:dV,borderColor:'#10b981',fill:true,backgroundColor:'rgba(16,185,129,0.1)',tension:0.3},{data:dI,borderColor:'#3b82f6',borderDash:[5,5]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false},ticks:{font:{size:9}}}}}});
 
-    // 3. Grouped Bar Chart (Maturity Analysis)
     if(cB)cB.destroy();
     cB=new Chart(_('chtB'),{
         type:'bar',
         data:{
-            labels:['Phase Analysis'],
+            labels:['Analysis'],
             datasets:[
                 {label:'Invested', data:[invT], backgroundColor:'#3b82f6', borderRadius:5},
-                {label:'Gross Value', data:[lastV], backgroundColor:'#fff', borderRadius:5},
-                {label:'Net (Post Tax)', data:[net], backgroundColor:'#10b981', borderRadius:5}
+                {label:'Gross', data:[lastV], backgroundColor:'#fff', borderRadius:5},
+                {label:'In-Hand', data:[netRedemption], backgroundColor:'#10b981', borderRadius:5}
             ]
         },
         options:{
