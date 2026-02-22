@@ -12,7 +12,7 @@
         .app{width:100%;max-width:1000px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:15px}
         header{grid-column:1/-1;text-align:center;margin-bottom:10px}
         h1{margin:0;font-size:2.2rem;color:var(--text);letter-spacing:-1px}
-        .panel{background:var(--c);padding:20px;border-radius:20px;border:1px solid var(--border);display:flex;flex-direction:column;min-height:580px}
+        .panel{background:var(--c);padding:20px;border-radius:20px;border:1px solid var(--border);display:flex;flex-direction:column;min-height:580px;overflow:hidden}
         .label{display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:#8b949e}
         .label b{color:var(--s);font-size:1rem}
         input[type=range]{width:100%;accent-color:var(--p);margin:8px 0;cursor:pointer}
@@ -22,8 +22,9 @@
         .tab.active{background:var(--border);color:var(--text);border-radius:8px}
         .sub-toggle{display:flex;justify-content:center;gap:12px;margin-bottom:12px;font-size:.8rem;color:#8b949e}
         .sub-toggle input:checked+span{color:var(--p);font-weight:700}
-        .view{display:none;height:280px;width:100%;margin-bottom:15px;position:relative}
+        .view{display:none;height:260px;width:100%;margin-bottom:15px;position:relative}
         .view.active{display:flex;flex-direction:column;align-items:center}
+        .chart-wrap{width:100%;height:100%;position:relative;padding:15px}
         .scroll{overflow-y:auto;width:100%;height:100%;border:1px solid var(--border);border-radius:10px}
         table{width:100%;border-collapse:collapse;font-size:.8rem}
         th{position:sticky;top:0;background:var(--border);padding:10px;text-align:left;color:var(--p)}
@@ -32,9 +33,8 @@
         .stat{background:rgba(128,128,128,.05);padding:10px;border-radius:12px;text-align:center;border:1px solid var(--border)}
         .stat label{font-size:.7rem;color:#8b949e;display:block}
         .stat span{font-size:1rem;font-weight:700;display:block}
-        .tax-wait-hint{font-size:.8rem;color:var(--t);margin-top:5px;display:block;text-align:right}
-        .swp-res{font-size:2.2rem;font-weight:800;margin:5px 0}
-        .swp-small{font-size:.85rem;display:block;opacity:.8;font-weight:400;color:var(--p);margin-top:5px}
+        .swp-res{font-size:2rem;font-weight:800;margin:5px 0}
+        .note-orange{font-size:.8rem;color:var(--t);margin-top:5px;display:block;line-height:1.2}
         .theme-btn{margin-top:20px;padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--c);color:var(--text);cursor:pointer;font-size:.8rem}
         input[type=radio]{display:none}
         hr{border:0;border-top:1px solid var(--border);margin:15px 0 10px}
@@ -54,7 +54,7 @@
         <input type="range" id="iSwp" min="1" max="12" step="0.5" value="3">
         <hr>
         <div class="label" style="opacity:.6">Tax Rate (LTCG %) <b id="v4"></b></div><input type="range" id="i4" min="0" max="30" step="0.5" value="12.5">
-        <span class="tax-wait-hint">Time to offset tax: <b id="rtw">0 Years</b></span>
+        <span class="note-orange" style="text-align:right">Time to offset tax: <b id="rtw">0 Years</b></span>
     </div>
     <div class="panel">
         <div class="tabs">
@@ -70,8 +70,8 @@
             </div>
             <div id="boxD" class="chart-wrap">
                 <canvas id="chtD"></canvas>
-                <div style="position:absolute;top:55%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none">
-                    <span style="color:#8b949e;font-size:.7rem">NET PROFIT</span><b id="rt" style="display:block;font-size:1.2rem">0</b>
+                <div style="position:absolute;top:55%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;width:100%">
+                    <span style="color:#8b949e;font-size:.7rem">NET PROFIT</span><b id="rt" style="display:block;font-size:1.1rem">0</b>
                 </div>
             </div>
             <div id="boxL" class="chart-wrap" style="display:none"><canvas id="chtL"></canvas></div>
@@ -79,9 +79,10 @@
         </div>
         <div id="c_maturity" class="view"><div class="chart-wrap"><canvas id="chtB"></canvas></div></div>
         <div id="c_swp" class="view" style="text-align:center">
-            <div style="color:#8b949e;margin-top:20px">Sustainability:</div>
+            <div style="color:#8b949e;margin-top:10px">Sustainability:</div>
             <div class="swp-res" id="swpLifeMain">...</div>
-            <div style="font-size:1rem;color:var(--s);margin-bottom:10px">Total Cash Out: <b id="totalSwpCash"></b></div>
+            <div style="font-size:0.95rem;color:var(--s);margin-bottom:10px">Total Cash Out: <b id="totalSwpCash"></b></div>
+            <span id="infNote" class="note-orange" style="display:none;padding:0 20px">Mathematically grows forever based on current parameters subject to market risk.</span>
         </div>
         <div class="grid">
             <div class="stat"><label>Invested</label><span id="ri" style="color:var(--s)">0</span></div>
@@ -100,28 +101,35 @@
     const _=id=>document.getElementById(id);let cD,cL,cB;
     const run=()=>{
         const cur="₹",A=+_('i1').value,rPa=+_('i2').value,r=rPa/100,yI=+_('i3').value,yA=+_('iWait').value,tx=+_('i4').value/100,sP=+_('iSwp').value/100,f=v=>cur+Math.round(v).toLocaleString('en-IN');
-        let h='',labs=[],dV=[],dV1=[],dV2=[],curW=0;const totY=yI+yA;
+        let h='',labs=[],dV1=[],dV2=[],curW=0;const totY=yI+yA;
         for(let i=1;i<=totY;i++){
             curW=i<=yI?(curW+A)*(1+r):curW*(1+r);
             const inv=i<=yI?A*i:A*yI;
             h+=`<tr><td>Year ${i}</td><td>${f(inv)}</td><td>${f(curW-inv)}</td><td>${f(curW)}</td></tr>`;
-            labs.push('Y'+i); dV.push(Math.round(curW));
-            if(i<=yI){dV1.push(Math.round(curW)); dV2.push(null)}
-            else{dV2.push(Math.round(curW)); if(i==yI+1) dV2[i-2]=dV1[i-2]}
+            labs.push('Y'+i);
+            if(i<=yI){ dV1.push(Math.round(curW)); dV2.push(null); }
+            else{ if(i===yI+1) dV1[i-1] = null; dV2.push(Math.round(curW)); if(i===yI+1) dV2[i-2]=dV1[i-2]; }
         }
-        const invT=A*yI,gM=dV[totY-1]||0,totG=gM-invT,tX=totG>0?totG*tx:0,nM=gM-tX,sA=nM*sP;
+        const invT=A*yI,gM=curW,totG=gM-invT,tX=totG>0?totG*tx:0,nM=gM-tX,sA=nM*sP;
         let sY=0,tC=nM,tW=0;
-        if(sA>(tC*r)){while(tC>sA&&sY<100){tC=(tC-sA)*(1+r);sY++;tW+=sA}_('swpLifeMain').innerText=sY+' Years';_('swpStat').innerText=sY+'y';_('swpLifeMain').style.color=sY>25?'var(--p)':'var(--t)'}
-        else{_('swpLifeMain').innerHTML=`Infinity<span class="swp-small">Mathematically grows forever based on current parameters</span>`;_('swpStat').innerText='Infinity';_('swpLifeMain').style.color='var(--p)';tW=sA*30}
+        _('infNote').style.display = 'none';
+        if(sA>(tC*r)){
+            while(tC>sA&&sY<100){tC=(tC-sA)*(1+r);sY++;tW+=sA}
+            _('swpLifeMain').innerText=sY+' Years';_('swpStat').innerText=sY+'y';_('swpLifeMain').style.color=sY>25?'var(--p)':'var(--t)';
+        } else {
+            _('swpLifeMain').innerText='Infinity';_('swpStat').innerText='Infinity';_('swpLifeMain').style.color='var(--p)';
+            _('infNote').style.display = 'block'; tW=sA*30;
+        }
         _('v1').innerText=f(A);_('v2').innerText=rPa+'%';_('v3').innerText=yI+'Y';_('vWait').innerText=yA+'Y';_('v4').innerText=_('i4').value+'%';_('swpVal').innerText=f(sA);_('swpPercDisp').innerText=(sP*100).toFixed(1)+'%';_('ri').innerText=f(invT);_('rgTotal').innerText=f(totG);_('rx').innerText=f(tX);_('rs').innerText=f(gM);_('rt').innerText=f(nM);_('gridSwp').innerText=f(sA);_('totalSwpCash').innerText=f(tW);_('tb').innerHTML=h;
         let exY=(tX>0&&gM>0&&r>0)?Math.ceil(Math.log(1+(tX/gM))/Math.log(1+r)):0;_('rtw').innerText=exY+' Years';
-        if(cD)cD.destroy();cD=new Chart(_('chtD'),{type:'doughnut',data:{datasets:[{data:[invT,totG-tX,tX],backgroundColor:['#3b82f6','#10b981','#f59e0b'],borderWidth:0}]},options:{cutout:'85%',maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-        if(cL)cL.destroy();cL=new Chart(_('chtL'),{type:'line',data:{labels:labs,datasets:[{label:'Investment',data:dV1,borderColor:'#3b82f6',fill:true,backgroundColor:'rgba(59,130,246,0.1)',tension:0.3},{label:'Accumulation',data:dV2,borderColor:'#10b981',fill:true,backgroundColor:'rgba(16,185,129,0.1)',tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false},ticks:{color:'#8b949e'}}}}});
-        if(cB)cB.destroy();cB=new Chart(_('chtB'),{type:'bar',data:{labels:['Total'],datasets:[{label:'Inv',data:[invT],backgroundColor:'#3b82f6'},{label:'Gain',data:[totG-tX],backgroundColor:'#10b981'},{label:'Tax',data:[tX],backgroundColor:'#f59e0b'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{stacked:true,display:false},x:{stacked:true,grid:{display:false}}}}});
+        
+        if(cD)cD.destroy();cD=new Chart(_('chtD'),{type:'doughnut',data:{datasets:[{data:[invT,totG-tX,tX],backgroundColor:['#3b82f6','#10b981','#f59e0b'],borderWidth:0}]},options:{cutout:'70%',layout:{padding:15},maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+        if(cL)cL.destroy();cL=new Chart(_('chtL'),{type:'line',data:{labels:labs,datasets:[{label:'Inv',data:dV1,borderColor:'#3b82f6',fill:true,backgroundColor:'rgba(59,130,246,0.1)',tension:0.3,spanGaps:true},{label:'Wait',data:dV2,borderColor:'#10b981',fill:true,backgroundColor:'rgba(16,185,129,0.1)',tension:0.3,spanGaps:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false},ticks:{color:'#8b949e'}}}}});
+        if(cB)cB.destroy();cB=new Chart(_('chtB'),{type:'bar',data:{labels:['Wealth'],datasets:[{label:'Inv',data:[invT],backgroundColor:'#3b82f6'},{label:'Gain',data:[totG-tX],backgroundColor:'#10b981'},{label:'Tax',data:[tX],backgroundColor:'#f59e0b'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{stacked:true,display:false},x:{stacked:true,grid:{display:false},ticks:{color:'#8b949e'}}}}});
     };
     ['i1','i2','i3','iWait','i4','iSwp'].forEach(id=>_(id).oninput=run);
-    document.getElementsByName('viz').forEach(r=>r.onchange=e=>{['boxD', 'boxL', 'boxT'].forEach(b=>_(b).style.display='none');_({donut:'boxD',graph:'boxL',table:'boxT'}[e.target.value]).style.display='block';if(cL)cL.resize();if(cD)cD.resize()});
-    document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab,.view').forEach(e=>e.classList.remove('active'));t.classList.add('active');_(t.dataset.v).classList.add('active');if(cB)cB.resize();if(cL)cL.resize()});
+    document.getElementsByName('viz').forEach(r=>r.onchange=e=>{['boxD','boxL','boxT'].forEach(b=>_(b).style.display='none');const m={donut:'boxD',graph:'boxL',table:'boxT'};_(m[e.target.value]).style.display='block';if(cL)cL.resize();if(cD)cD.resize()});
+    document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab,.view').forEach(e=>e.classList.remove('active'));t.classList.add('active');_(t.dataset.v).classList.add('active');if(cB)cB.resize();if(cL)cL.resize();if(cD)cD.resize();});
     run();
 </script>
 </body>
