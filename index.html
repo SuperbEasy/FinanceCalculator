@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>PureCalc Pro | Wealth & IRR Expert</title>
+    <title>PureCalc Pro | Wealth & SWP Expert</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root{--p:#10b981;--s:#3b82f6;--t:#f59e0b;--v:#a855f7;--bg:#0a0c10;--c:#161b22;--border:#30363d;--text:#e6edf3}
@@ -12,178 +12,163 @@
         .app{width:100%;max-width:1100px;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:15px}
         header{grid-column:1/-1;text-align:center;margin-bottom:10px}
         h1{margin:0;font-size:2.2rem;color:var(--text);letter-spacing:-1px}
-        .panel{background:var(--c);padding:20px;border-radius:20px;border:1px solid var(--border);display:flex;flex-direction:column;min-height:700px;overflow:hidden}
+        .panel{background:var(--c);padding:20px;border-radius:20px;border:1px solid var(--border);display:flex;flex-direction:column;min-height:650px;overflow:hidden}
         .label{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:#8b949e}
         .label b{color:var(--s);font-size:0.95rem}
         input[type=range]{width:100%;accent-color:var(--p);margin:6px 0;cursor:pointer}
-        .highlight-box{background:rgba(0,0,0,0.2);border:1px solid var(--border);color:var(--p);padding:4px 10px;border-radius:6px;font-weight:bold}
+        .swp-box{background:rgba(0,0,0,0.2);border:1px solid var(--border);color:var(--p);padding:4px 10px;border-radius:6px;font-weight:bold}
         .tabs{display:flex;background:rgba(0,0,0,0.2);padding:3px;border-radius:10px;margin-bottom:12px}
         .tab{flex:1;padding:8px;border:none;background:none;color:#8b949e;cursor:pointer;font-size:.75rem;font-weight:600}
         .tab.active{background:var(--border);color:var(--text);border-radius:8px}
-        .view{display:none;height:350px;width:100%;margin-bottom:15px;position:relative}
+        .view{display:none;height:300px;width:100%;margin-bottom:15px;position:relative}
         .view.active{display:flex;flex-direction:column}
+        .chart-wrap{width:100%;height:100%;position:relative;padding:5px}
         .scroll{overflow-y:auto;width:100%;height:100%;border:1px solid var(--border);border-radius:10px;background:rgba(0,0,0,0.1)}
         table{width:100%;border-collapse:collapse;font-size:.75rem}
         th{position:sticky;top:0;background:var(--border);padding:8px;text-align:left;color:var(--p);z-index:2}
         td{padding:8px;border-bottom:1px solid var(--border)}
+        
+        /* Stats Table Style */
         .stats-table{width:100%;margin-top:auto;border:1px solid var(--border);border-radius:10px;overflow:hidden}
         .stats-table td{padding:6px 10px;background:rgba(255,255,255,0.02)}
         .stats-table .val{text-align:right;font-weight:700}
         .stats-table .head{color:#8b949e;font-size:0.7rem;text-transform:uppercase}
-        .big-res{font-size:1.8rem;font-weight:800;margin:2px 0}
-        .irr-badge{background:var(--v);color:white;padding:2px 8px;border-radius:4px;font-size:0.8rem}
+
+        .swp-res{font-size:1.8rem;font-weight:800;margin:2px 0}
+        .note-orange{font-size:.7rem;color:var(--t);display:block;line-height:1.2}
+        .stress-btn{background:var(--t);color:#000;border:none;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;margin-top:5px}
+        .info-link{color:var(--p);text-decoration:none;font-weight:bold;border:1px solid var(--p);padding:8px 16px;border-radius:30px;display:inline-block;margin:15px 0}
         hr{border:0;border-top:1px solid var(--border);margin:10px 0}
     </style>
 </head>
 <body>
 <div class="app">
-    <header><h1>PureCalc Pro</h1><div style="color:var(--p);font-weight:600">Wealth & IRR Modeler</div></header>
+    <header><h1>PureCalc Pro</h1><div style="color:var(--p);font-weight:600">Advanced Wealth Modeler</div></header>
     
     <div class="panel">
-        <div class="label">Annual Investment <b id="v1"></b></div><input type="range" id="i1" min="10000" max="5000000" step="10000" value="1300000">
-        <div class="label">Investment Phase (Years) <b id="v3"></b></div><input type="range" id="i3" min="1" max="25" value="12">
-        <div class="label">Deferment (Waiting) Period <b id="vWait"></b></div><input type="range" id="iWait" min="0" max="10" value="5">
-        <div class="label">Withdrawal Period (Years) <b id="vWithdraw"></b></div><input type="range" id="iWithdraw" min="1" max="40" value="20">
+        <div class="label">Annual Investment <b id="v1"></b></div><input type="range" id="i1" min="10000" max="2000000" step="10000" value="120000">
+        <div class="label">Expected Growth (%) <b id="v2"></b></div><input type="range" id="i2" min="1" max="25" step="0.5" value="12">
+        <div class="label">Investment Phase (Years) <b id="v3"></b></div><input type="range" id="i3" min="1" max="40" value="10">
+        <div class="label">Accumulation Phase <b id="vWait"></b></div><input type="range" id="iWait" min="0" max="30" value="5">
         <hr>
-        <div class="label">Yearly Payout <span id="swpVal" class="highlight-box">0</span></div>
-        <div class="label">Expected Return/IRR (%) <b id="v2"></b></div><input type="range" id="i2" min="1" max="15" step="0.01" value="6.48">
+        <div class="label">SWP (Yearly) <span id="swpVal" class="swp-box">0</span></div>
+        <div class="label" style="opacity:.7">Withdrawal Rate: <b id="swpPercDisp">3%</b></div>
+        <input type="range" id="iSwp" min="1" max="12" step="0.5" value="3">
+        <div class="label">Expected Inflation (%) <b id="vInfl"></b></div><input type="range" id="iInfl" min="0" max="12" step="0.5" value="5">
+        <hr>
+        <div class="label" style="opacity:.6">Tax Rate (LTCG %) <b id="v4"></b></div><input type="range" id="i4" min="0" max="30" step="0.5" value="12.5">
+        <span class="note-orange" style="text-align:right">Tax Offset: <b id="rtw">0 Years</b></span>
         
-        <table class="stats-table" style="margin-top:15px">
-            <tr><td class="head">Total Invested</td><td class="val" id="ri" style="color:var(--s)">0</td></tr>
-            <tr><td class="head">Total Payouts</td><td class="val" id="rgTotal" style="color:var(--p)">0</td></tr>
-            <tr><td class="head">Maturity (Terminal Val)</td><td class="val" id="rvMat" style="color:var(--v)">0</td></tr>
-            <tr><td class="head">Projected IRR</td><td class="val"><span class="irr-badge" id="vIrr">0%</span></td></tr>
+        <table class="stats-table">
+            <tr><td class="head">Invested</td><td class="val" id="ri" style="color:var(--s)">0</td></tr>
+            <tr><td class="head">SIP Profit</td><td class="val" id="rgSIP" style="color:var(--s)">0</td></tr>
+            <tr><td class="head">Accumulation Gain</td><td class="val" id="rgAcc" style="color:var(--v)">0</td></tr>
+            <tr><td class="head">Total Profit</td><td class="val" id="rgTotal" style="color:var(--p)">0</td></tr>
+            <tr><td class="head">Tax Est.</td><td class="val" id="rx" style="color:#ff4d4d">0</td></tr>
+            <tr><td class="head">First SWP</td><td class="val" id="gridSwp" style="color:var(--p)">0</td></tr>
         </table>
     </div>
 
     <div class="panel">
         <div class="tabs">
-            <button class="tab active" data-v="c_analysis">Cash Flow Timeline</button>
-            <button class="tab" data-v="c_chart">Growth Visualization</button>
+            <button class="tab active" data-v="c_analysis">Accumulation</button>
+            <button class="tab" data-v="c_swp">SWP Longevity</button>
+            <button class="tab" data-v="c_stress">Stress Test</button>
         </div>
 
         <div id="c_analysis" class="view active">
-            <div class="scroll">
-                <table>
-                    <thead><tr><th>Year</th><th>Action</th><th>Amount</th><th>Balance</th></tr></thead>
-                    <tbody id="tbFlow"></tbody>
-                </table>
+            <div class="chart-wrap" style="height:180px"><canvas id="chtL"></canvas></div>
+            <div class="scroll" style="margin-top:10px">
+                <table><thead><tr><th>Year</th><th>Capital</th><th>Growth</th><th>Total</th></tr></thead><tbody id="tbAcc"></tbody></table>
             </div>
         </div>
 
-        <div id="c_chart" class="view">
-            <div style="height:100%"><canvas id="chtMain"></canvas></div>
+        <div id="c_swp" class="view" style="text-align:center">
+            <div class="swp-res" id="swpLifeMain" style="color:var(--p)">...</div>
+            <span id="infNote" class="note-orange" style="display:none;margin-bottom:5px">Grows forever under current parameters.</span>
+            <div class="chart-wrap" style="height:140px"><canvas id="chtS"></canvas></div>
+            <div class="scroll" style="margin-top:10px">
+                <table><thead><tr><th>Year</th><th>Withdrawal</th><th>Balance</th></tr></thead><tbody id="tbSwp"></tbody></table>
+            </div>
         </div>
 
-        <div style="margin-top:auto; padding:15px; background:rgba(168,85,247,0.1); border-radius:10px; text-align:center; border:1px solid var(--v)">
-            <span style="color:#8b949e;font-size:.7rem">TOTAL ESTIMATED RETURNS</span>
-            <div id="rt" style="font-size:1.8rem;font-weight:800;color:var(--text)">0</div>
+        <div id="c_stress" class="view" style="text-align:center">
+            <div style="color:var(--t);font-weight:700">🚨 20% Early Retirement Crash</div>
+            <div class="swp-res" id="stressLife" style="color:var(--t)">- -</div>
+            <div id="stressNote" style="font-size:0.8rem;margin-bottom:10px">Survival if market crashes in Year 1 of SWP.</div>
+            <div class="chart-wrap" style="height:140px"><canvas id="chtC"></canvas></div>
+            <button class="stress-btn" onclick="run()">Recalculate Stress</button>
+        </div>
+
+        <div style="margin-top:auto; padding:10px; background:rgba(0,0,0,0.2); border-radius:10px; text-align:center">
+            <span style="color:#8b949e;font-size:.7rem">NET WEALTH (AFTER TAX)</span>
+            <div id="rt" style="font-size:1.5rem;font-weight:800;color:var(--p)">0</div>
         </div>
     </div>
 </div>
 
+<div style="text-align:center">
+    <a href="information.html" class="info-link">🚀 Master Your Money: Rahul's Story</a><br>
+    <button class="theme-btn" onclick="document.body.classList.toggle('light-mode')" style="background:none;border:1px solid var(--border);color:var(--text);padding:8px 15px;border-radius:20px;cursor:pointer">🌓 Dark/Light</button>
+</div>
+
 <script>
-    const _=id=>document.getElementById(id); let chart;
-
-    // Financial function to calculate Payout based on IRR
-    // Formula: PV of Inflows = PV of Outflows
-    const calculatePayout = (annualInv, invY, waitY, withY, rate) => {
-        const r = rate / 100;
-        if(r === 0) return (annualInv * invY) / withY;
-        
-        // Future Value of investments at end of deferment
-        let fvInvest = 0;
-        for(let i=0; i<invY; i++) {
-            fvInvest += annualInv * Math.pow(1 + r, (invY + waitY - i));
-        }
-        
-        // Payout is an annuity whose PV equals fvInvest
-        const payout = fvInvest * (r / (1 - Math.pow(1 + r, -withY)));
-        return payout;
-    };
-
+    const _=id=>document.getElementById(id); let cL, cS, cC;
     const run=()=>{
-        const cur="₹", 
-              A = +_('i1').value, 
-              yI = +_('i3').value, 
-              yW = +_('iWait').value, 
-              yD = +_('iWithdraw').value, 
-              irr = +_('i2').value,
-              f = v => cur + Math.round(v).toLocaleString('en-IN');
-
-        const payout = calculatePayout(A, yI, yW, yD, irr);
-        const totalInvested = A * yI;
-        const totalReturns = payout * yD;
+        const cur="₹", A=+_('i1').value, rPa=+_('i2').value, r=rPa/100, yI=+_('i3').value, yA=+_('iWait').value, tx=+_('i4').value/100, sP=+_('iSwp').value/100, infl=+_('iInfl').value/100, f=v=>cur+Math.round(v).toLocaleString('en-IN');
         
-        // UI Updates
-        _('v1').innerText = f(A);
-        _('v2').innerText = irr + '%';
-        _('v3').innerText = yI + 'Y';
-        _('vWait').innerText = yW + 'Y';
-        _('vWithdraw').innerText = yD + 'Y';
-        _('ri').innerText = f(totalInvested);
-        _('rgTotal').innerText = f(totalReturns);
-        _('swpVal').innerText = f(payout);
-        _('vIrr').innerText = irr + '%';
-        
-        // Since fixed plans often have a "Maturity" component (often the last payout or return of premium)
-        // In your friend's image, the last year has a massive maturity. Let's model the flow:
-        let html = '', balance = 0, labels = [], data = [];
-        
-        // 1. Investment Phase
-        for(let i=1; i<=yI; i++){
-            balance = (balance + A) * (1 + irr/100);
-            html += `<tr><td>${i}</td><td style="color:var(--s)">Invest</td><td>-${f(A)}</td><td>${f(balance)}</td></tr>`;
-            labels.push('Y'+i); data.push(balance);
+        // 1. Accumulation Phase
+        let hAcc='', labsAcc=[], dV1=[], dV2=[], curW=0, sipG=0, accG=0;
+        for(let i=1; i<=(yI+yA); i++){
+            let prevW = curW;
+            curW = i<=yI ? (curW+A)*(1+r) : curW*(1+r);
+            if(i<=yI) sipG += (curW - prevW - A); else accG += (curW - prevW);
+            
+            hAcc += `<tr><td>Year ${i}</td><td>${f(i<=yI?A*i:A*yI)}</td><td>${f(curW-(i<=yI?A*i:A*yI))}</td><td>${f(curW)}</td></tr>`;
+            labsAcc.push('Y'+i);
+            if(i<=yI){ dV1.push(Math.round(curW)); dV2.push(null); }
+            else{ dV2.push(Math.round(curW)); if(i===yI+1) dV2[i-2]=dV1[i-2]; }
         }
         
-        // 2. Waiting Phase
-        for(let i=1; i<=yW; i++){
-            balance = balance * (1 + irr/100);
-            html += `<tr><td>${yI+i}</td><td style="color:var(--t)">Defer</td><td>--</td><td>${f(balance)}</td></tr>`;
-            labels.push('Y'+(yI+i)); data.push(balance);
-        }
-        
-        // 3. Payout Phase
-        for(let i=1; i<=yD; i++){
-            balance = (balance - payout) * (1 + irr/100);
-            html += `<tr><td>${yI+yW+i}</td><td style="color:var(--p)">Payout</td><td>+${f(payout)}</td><td>${f(Math.max(0, balance))}</td></tr>`;
-            labels.push('Y'+(yI+yW+i)); data.push(Math.max(0, balance));
+        const invT=A*yI, gM=curW, totG=gM-invT, tX=totG>0?totG*tx:0, nM=gM-tX, sA_start=nM*sP;
+
+        // 2. SWP Phase (Normal)
+        let hSwp='', labsSwp=[], dVS=[], sY=0, tC=nM, currSA=sA_start;
+        while(tC>=currSA && sY<50){
+            tC = (tC - currSA) * (1+r);
+            sY++;
+            hSwp += `<tr><td>Year ${sY}</td><td>${f(currSA)}</td><td>${f(tC)}</td></tr>`;
+            labsSwp.push('Y'+sY); dVS.push(Math.round(tC));
+            currSA *= (1+infl);
         }
 
-        _('tbFlow').innerHTML = html;
-        _('rt').innerText = f(totalReturns);
-        _('rvMat').innerText = f(payout * 1.5); // Representative maturity estimate
+        // 3. Stress Phase (-20% Crash)
+        let stY=0, stC=nM*0.8, stSA=sA_start, dVC=[], labsC=[];
+        while(stC>=stSA && stY<50){
+            stC = (stC - stSA) * (1+r);
+            stY++;
+            stSA *= (1+infl);
+            dVC.push(Math.round(stC)); labsC.push('Y'+stY);
+        }
 
-        if(chart) chart.destroy();
-        chart = new Chart(_('chtMain'), {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Policy Value',
-                    data: data,
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16,185,129,0.1)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#8b949e' } } }
-            }
-        });
+        // Update UI
+        _('v1').innerText=f(A); _('v2').innerText=rPa+'%'; _('v3').innerText=yI+'Y'; _('vWait').innerText=yA+'Y'; _('v4').innerText=_('i4').value+'%'; _('vInfl').innerText=(infl*100).toFixed(1)+'%';
+        _('ri').innerText=f(invT); _('rgSIP').innerText=f(sipG); _('rgAcc').innerText=f(accG); _('rgTotal').innerText=f(totG); _('rx').innerText=f(tX); _('rt').innerText=f(nM); _('gridSwp').innerText=f(sA_start);
+        _('swpVal').innerText=f(sA_start); _('swpPercDisp').innerText=(sP*100).toFixed(1)+'%';
+        _('swpLifeMain').innerText=sY >= 50 ? 'Infinity' : sY+' Years';
+        _('infNote').style.display=sY>=50?'block':'none';
+        _('stressLife').innerText=stY+' Years';
+        _('tbAcc').innerHTML=hAcc; _('tbSwp').innerHTML=hSwp;
+        _('rtw').innerText=((tX>0&&gM>0&&r>0)?Math.ceil(Math.log(1+(tX/gM))/Math.log(1+r)):0)+' Years';
+
+        // Charts
+        if(cL)cL.destroy(); cL=new Chart(_('chtL'),{type:'line',data:{labels:labsAcc,datasets:[{label:'SIP',data:dV1,borderColor:'#3b82f6',fill:true,backgroundColor:'rgba(59,130,246,0.1)',tension:0.3,spanGaps:true},{label:'Acc',data:dV2,borderColor:'#a855f7',fill:true,backgroundColor:'rgba(168,85,247,0.1)',tension:0.3,spanGaps:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false},ticks:{color:'#8b949e'}}}}});
+        if(cS)cS.destroy(); cS=new Chart(_('chtS'),{type:'line',data:{labels:labsSwp,datasets:[{label:'Balance',data:dVS,borderColor:'#10b981',tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false}}}}});
+        if(cC)cC.destroy(); cC=new Chart(_('chtC'),{type:'line',data:{labels:labsC,datasets:[{label:'Crash',data:dVC,borderColor:'#ff4d4d',tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false}}}}});
     };
 
-    ['i1','i2','i3','iWait', 'iWithdraw'].forEach(id=>_(id).oninput=run);
-    document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
-        document.querySelectorAll('.tab,.view').forEach(e=>e.classList.remove('active'));
-        t.classList.add('active'); _(t.dataset.v).classList.add('active');
-        if(chart) chart.resize();
-    });
+    ['i1','i2','i3','iWait','i4','iSwp','iInfl'].forEach(id=>_(id).oninput=run);
+    document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab,.view').forEach(e=>e.classList.remove('active'));t.classList.add('active');_(t.dataset.v).classList.add('active');if(cL)cL.resize();if(cS)cS.resize();if(cC)cC.resize();});
     run();
 </script>
 </body>
