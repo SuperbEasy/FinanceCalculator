@@ -1,171 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SIP Calculator</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 2vh 2vw;
-      background: #f9f9f9;
-      color: #333;
-    }
-    .container {
-      max-width: 90vw;
-      margin: auto;
-    }
-    h1 {
-      text-align: center;
-      font-size: 3vh;
-    }
-    .input-group {
-      margin: 2vh 0;
-    }
-    label {
-      display: block;
-      font-size: 2vh;
-      margin-bottom: 1vh;
-    }
-    input, select {
-      width: 100%;
-      padding: 1vh;
-      font-size: 2vh;
-    }
-    .slider {
-      width: 100%;
-    }
-    #results {
-      margin-top: 3vh;
-      font-size: 2vh;
-    }
-    canvas {
-      width: 100%;
-      max-height: 40vh;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 3vh;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 1vh;
-      text-align: center;
-      font-size: 1.8vh;
-    }
-    th {
-      background: #eee;
-    }
-  </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SIP Calculator</title>
+<style>
+body{margin:0;font:2vh 'Segoe UI',sans-serif;background:linear-gradient(135deg,#e8f5e9,#fffde7);color:#333}
+.container{display:flex;flex-wrap:wrap;min-height:100vh}
+.left,.right{flex:1 1 50%;padding:3vh 3vw;box-sizing:border-box}
+.left{background:#f1f8e9;border-right:2px solid #c8e6c9}
+.right{background:#fff}
+h1{text-align:center;font-size:3vh;color:#2e7d32}
+.input-group{margin:2vh 0}
+label{display:block;font-size:2vh;margin-bottom:1vh;color:#33691e}
+input,select{width:100%;padding:1vh;font-size:2vh;border:1px solid #c5e1a5;border-radius:5px}
+.slider{width:100%;margin-top:1vh}
+.tabs{display:flex;border-bottom:2px solid #c8e6c9;margin-bottom:2vh}
+.tab{flex:1;text-align:center;padding:1vh;cursor:pointer;font-size:2vh;background:#f1f8e9;color:#2e7d32}
+.tab.active{background:#c5e1a5;font-weight:bold}
+.tab-content{display:none}
+.tab-content.active{display:block}
+#results{margin-top:2vh;font-size:2vh;background:#f9fbe7;padding:2vh;border-radius:8px;border:1px solid #cddc39}
+canvas{width:100%;max-height:40vh}
+table{width:100%;border-collapse:collapse;margin-top:2vh}
+th,td{border:1px solid #c8e6c9;padding:1vh;text-align:center;font-size:1.8vh}
+th{background:#c5e1a5;color:#1b5e20}
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>SIP Calculator</h1>
-
-    <div class="input-group">
-      <label>Currency</label>
-      <select id="currency">
-        <option value="$">$</option>
-        <option value="₹">₹</option>
-        <option value="€">€</option>
-      </select>
-    </div>
-
-    <div class="input-group">
-      <label>Monthly Amount</label>
-      <input type="number" id="monthlyAmount" min="500" max="100000" step="500" value="500">
-      <input type="range" id="monthlyAmountSlider" min="500" max="100000" step="500" value="500" class="slider">
-    </div>
-
-    <div class="input-group">
-      <label>Expected Return Rate (%)</label>
-      <input type="number" id="returnRate" min="1" max="50" step="1" value="10">
-      <input type="range" id="returnRateSlider" min="1" max="50" step="1" value="10" class="slider">
-    </div>
-
-    <div class="input-group">
-      <label>SIP Duration (Years)</label>
-      <input type="number" id="duration" min="1" max="99" step="1" value="10">
-      <input type="range" id="durationSlider" min="1" max="99" step="1" value="10" class="slider">
-    </div>
-
-    <div class="input-group">
-      <label>Tax Rate (%)</label>
-      <input type="number" id="taxRate" min="10" max="50" step="0.5" value="12.5">
-      <input type="range" id="taxRateSlider" min="10" max="50" step="0.5" value="12.5" class="slider">
-    </div>
-
-    <button onclick="calculate()">Calculate</button>
-
-    <div id="results"></div>
-    <canvas id="pieChart"></canvas>
-    <table id="growthTable"></table>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    function syncInputs(numInput, slider) {
-      numInput.addEventListener('input', () => slider.value = numInput.value);
-      slider.addEventListener('input', () => numInput.value = slider.value);
-    }
-
-    syncInputs(document.getElementById('monthlyAmount'), document.getElementById('monthlyAmountSlider'));
-    syncInputs(document.getElementById('returnRate'), document.getElementById('returnRateSlider'));
-    syncInputs(document.getElementById('duration'), document.getElementById('durationSlider'));
-    syncInputs(document.getElementById('taxRate'), document.getElementById('taxRateSlider'));
-
-    let chart;
-
-    function calculate() {
-      const currency = document.getElementById('currency').value;
-      const monthlyAmount = parseFloat(document.getElementById('monthlyAmount').value);
-      const returnRate = parseFloat(document.getElementById('returnRate').value) / 100;
-      const duration = parseInt(document.getElementById('duration').value);
-      const taxRate = parseFloat(document.getElementById('taxRate').value) / 100;
-
-      const months = duration * 12;
-      let invested = monthlyAmount * months;
-      let futureValue = 0;
-
-      // SIP formula: FV = P * [((1+r)^n - 1) / r] * (1+r)
-      const monthlyRate = returnRate / 12;
-      futureValue = monthlyAmount * (((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * (1 + monthlyRate));
-
-      const returns = futureValue - invested;
-      const tax = returns * taxRate;
-      const totalValue = futureValue - tax;
-
-      document.getElementById('results').innerHTML = `
-        <p>Invested Amount: ${currency}${invested.toFixed(2)}</p>
-        <p>Estimated Returns: ${currency}${returns.toFixed(2)}</p>
-        <p>Total Value (after tax): ${currency}${totalValue.toFixed(2)}</p>
-        <p>Long Term Capital Gain Tax: ${currency}${tax.toFixed(2)}</p>
-      `;
-
-      // Pie Chart
-      const ctx = document.getElementById('pieChart').getContext('2d');
-      if (chart) chart.destroy();
-      chart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: ['Invested', 'Returns', 'Tax'],
-          datasets: [{
-            data: [invested, returns, tax],
-            backgroundColor: ['#4CAF50', '#2196F3', '#FF5722']
-          }]
-        }
-      });
-
-      // Growth Table
-      let tableHTML = `<tr><th>Year</th><th>Invested</th><th>Value</th></tr>`;
-      for (let year = 1; year <= duration; year++) {
-        const monthsYear = year * 12;
-        const valueYear = monthlyAmount * (((Math.pow(1 + monthlyRate, monthsYear) - 1) / monthlyRate) * (1 + monthlyRate));
-        tableHTML += `<tr><td>${year}</td><td>${currency}${(monthlyAmount * monthsYear).toFixed(2)}</td><td>${currency}${valueYear.toFixed(2)}</td></tr>`;
-      }
-      document.getElementById('growthTable').innerHTML = tableHTML;
-    }
-  </script>
+<div class="container">
+<div class="left">
+<h1>SIP Calculator</h1>
+<div class="input-group"><label>Currency</label><select id="currency"><option>$</option><option>₹</option><option>€</option></select></div>
+<div class="input-group"><label>Monthly Amount</label><input type="number" id="monthlyAmount" min="500" max="100000" step="500" value="500"><input type="range" id="monthlyAmountSlider" min="500" max="100000" step="500" value="500" class="slider"></div>
+<div class="input-group"><label>Expected Return Rate (%)</label><input type="number" id="returnRate" min="1" max="50" step="1" value="10"><input type="range" id="returnRateSlider" min="1" max="50" step="1" value="10" class="slider"></div>
+<div class="input-group"><label>SIP Duration (Years)</label><input type="number" id="duration" min="1" max="99" step="1" value="10"><input type="range" id="durationSlider" min="1" max="99" step="1" value="10" class="slider"></div>
+<div class="input-group"><label>Tax Rate (%)</label><input type="number" id="taxRate" min="10" max="50" step="0.5" value="12.5"><input type="range" id="taxRateSlider" min="10" max="50" step="0.5" value="12.5" class="slider"></div>
+</div>
+<div class="right">
+<div class="tabs"><div class="tab active" data-tab="graphics">Graphics</div><div class="tab" data-tab="tabular">Tabular</div></div>
+<div id="graphics" class="tab-content active"><canvas id="pieChart"></canvas></div>
+<div id="tabular" class="tab-content"><table id="growthTable"></table></div>
+<div id="results"></div>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const $=id=>document.getElementById(id),sync=(a,b)=>{a.oninput=()=>{b.value=a.value;calc()};b.oninput=()=>{a.value=b.value;calc()}};
+['monthlyAmount','returnRate','duration','taxRate'].forEach(x=>sync($(x),$(x+'Slider')));
+$('currency').onchange=calc;
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab,.tab-content').forEach(e=>e.classList.remove('active'));t.classList.add('active');$(t.dataset.tab).classList.add('active')});
+let chart;
+function calc(){
+let c=$('currency').value,m=+$('monthlyAmount').value,r=+$('returnRate').value/100,d=+$('duration').value,t=+$('taxRate').value/100,n=d*12,i=m*n,u=m*(((Math.pow(1+r/12,n)-1)/(r/12))*(1+r/12)),ret=u-i,tax=ret*t,tot=u-tax;
+$('results').innerHTML=`<p><b>Invested:</b> ${c}${i.toFixed(2)}</p><p><b>Returns:</b> ${c}${ret.toFixed(2)}</p><p><b>Tax:</b> ${c}${tax.toFixed(2)}</p><p><b>Total:</b> ${c}${tot.toFixed(2)}</p>`;
+if(chart)chart.destroy();chart=new Chart($('pieChart'),{type:'pie',data:{labels:['Invested','Returns','Tax'],datasets:[{data:[i,ret,tax],backgroundColor:['#4CAF50','#FFD700','#FF7043']}]}});let tbl='<tr><th>Year</th><th>Invested</th><th>Value</th></tr>';for(let y=1;y<=d;y++){let v=m*(((Math.pow(1+r/12,y*12)-1)/(r/12))*(1+r/12));tbl+=`<tr><td>${y}</td><td>${c}${(m*y*12).toFixed(2)}</td><td>${c}${v.toFixed(2)}</td></tr>`}$('growthTable').innerHTML=tbl}
+calc();
+</script>
 </body>
 </html>
