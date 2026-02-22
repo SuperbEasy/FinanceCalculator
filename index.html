@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>PureCalc SIP Pro</title>
+<title>PureCalc: Steady Growth Investment</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root{--p:#10b981;--s:#3b82f6;--t:#f59e0b;--bg:#0a0c10;--c:#161b22}
@@ -12,17 +12,16 @@ body{margin:0;font:1.4vh 'Inter',sans-serif;background:var(--bg);color:#e6edf3;d
 .panel{background:var(--c);padding:20px;border-radius:24px;border:1px solid #30363d;display:flex;flex-direction:column}
 header{grid-column:1/-1;text-align:center}
 h1{margin:0;font-size:3vh;color:#fff}
+.disclaimer-top{grid-column:1/-1;background:rgba(245,158,11,0.1);border:1px solid var(--t);color:var(--t);padding:8px;border-radius:10px;font-size:0.9vh;text-align:center;margin-bottom:-10px}
 .label{display:flex;justify-content:space-between;margin-top:12px;font-size:1.2vh;color:#8b949e}
 .label b{color:var(--s)}
 input[type=range]{width:100%;accent-color:var(--p);margin:5px 0;cursor:pointer}
-/* Tabs & Toggles */
 .tabs{display:flex;background:#000;padding:3px;border-radius:12px;margin-bottom:15px}
 .tab{flex:1;padding:8px 12px;border:none;background:none;color:#8b949e;cursor:pointer;font-size:1.1vh;font-weight:600}
 .tab.active{background:#30363d;color:#fff;border-radius:9px}
 .sub-toggle{display:flex;justify-content:center;gap:10px;margin-bottom:10px;font-size:1vh}
 .sub-toggle label{cursor:pointer;opacity:0.5;transition:0.2s}
 .sub-toggle input:checked + span{opacity:1;color:var(--p);font-weight:700}
-/* Views */
 .view{display:none;height:260px;width:100%;margin-bottom:15px;position:relative}
 .view.active{display:flex;justify-content:center;align-items:center}
 .chart-container{width:100%;height:100%}
@@ -32,30 +31,32 @@ input[type=range]{width:100%;accent-color:var(--p);margin:5px 0;cursor:pointer}
 table{width:100%;border-collapse:collapse;font-size:1.1vh}
 th{position:sticky;top:0;background:#21262d;padding:10px;text-align:left;color:var(--p)}
 td{padding:10px;border-bottom:1px solid #30363d}
-/* Stats Grid */
 .grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:8px;margin-top:auto}
 .stat{background:rgba(255,255,255,0.02);padding:10px;border-radius:12px;text-align:center;border:1px solid #30363d;position:relative}
 .stat span{font-size:1.4vh;font-weight:700;display:block;margin-top:2px}
 .info-btn{font-size:0.9vh;cursor:pointer;color:var(--s);border:1px solid var(--s);border-radius:50%;width:12px;height:12px;display:inline-flex;align-items:center;justify-content:center;margin-left:4px}
-/* Bottom Currency */
 .cur-wrap{grid-column:1/-1;display:flex;justify-content:center;gap:15px;margin:10px 0}
 .cur-wrap label{font-size:1vh;padding:5px 12px;background:#161b22;border-radius:8px;cursor:pointer;border:1px solid #30363d}
 .cur-wrap input:checked+span{color:var(--p);font-weight:700}
 input[type=radio]{display:none}
 hr{border:0;border-top:1px solid #30363d;margin:15px 0 10px}
 .acc-tag{font-size:0.8vh;background:rgba(16,185,129,0.2);color:var(--p);padding:2px 5px;border-radius:4px;margin-left:8px;border:1px solid var(--p)}
-footer{grid-column:1/-1;text-align:center;font-size:1vh;color:#484f58;padding:10px}
+footer{grid-column:1/-1;text-align:center;font-size:1vh;color:#484f58;padding:10px;line-height:1.4}
 </style>
 </head>
 <body>
 
 <div class="app">
-    <header><h1>PureCalc SIP</h1><span style="color:var(--p)">Genuine • Fact-Based • Practical</span></header>
+    <header><h1>PureCalc</h1><span style="color:var(--p)">Steady Wealth • Fact-Based • Educational</span></header>
     
+    <div class="disclaimer-top">
+        <b>NOTE:</b> This is a mathematical tool for illustration. Market returns are never fixed.
+    </div>
+
     <div class="panel">
-        <div class="label">Monthly SIP Amount <b id="v1"></b></div><input type="range" id="i1" min="500" max="100000" step="500" value="10000">
-        <div class="label">Expected Returns (%) <b id="v2"></b></div><input type="range" id="i2" min="1" max="25" step=".5" value="12">
-        <div class="label">SIP Duration (Years) <b id="v3"></b></div><input type="range" id="i3" min="1" max="40" value="10">
+        <div class="label">Monthly Investment <b id="v1"></b></div><input type="range" id="i1" min="500" max="100000" step="500" value="10000">
+        <div class="label">Expected Growth (%) <b id="v2"></b></div><input type="range" id="i2" min="1" max="25" step=".5" value="12">
+        <div class="label">Investment Phase (Years) <b id="v3"></b></div><input type="range" id="i3" min="1" max="40" value="10">
         <div class="label">Wealth Accumulation (Years) <b id="vWait"></b></div><input type="range" id="iWait" min="0" max="30" value="5">
         <hr>
         <div class="label" style="opacity:0.6">Tax Rate (LTCG %) <b id="v4"></b></div><input type="range" id="i4" min="0" max="30" step=".5" value="12.5">
@@ -64,20 +65,20 @@ footer{grid-column:1/-1;text-align:center;font-size:1vh;color:#484f58;padding:10
     <div class="panel">
         <div class="tabs">
             <button class="tab active" data-v="c_analysis">Analysis</button>
-            <button class="tab" data-v="c_table">Table</button>
+            <button class="tab" data-v="c_table">Yearly View</button>
             <button class="tab" data-v="c_maturity">Maturity</button>
         </div>
         
         <div id="c_analysis" class="view active" style="flex-direction:column">
             <div class="sub-toggle">
-                <label><input type="radio" name="viz" value="donut" checked><span>Donut Way</span></label>
+                <label><input type="radio" name="viz" value="donut" checked><span>Composition</span></label>
                 <span style="color:#30363d">|</span>
-                <label><input type="radio" name="viz" value="graph"><span>Graph Way</span></label>
+                <label><input type="radio" name="viz" value="graph"><span>Timeline</span></label>
             </div>
             <div id="boxD" class="chart-container" style="position:relative">
                 <canvas id="chtD"></canvas>
                 <div class="center" style="top:50%;left:50%;transform:translate(-50%,-50%)">
-                    <span style="color:#8b949e;font-size:0.9vh">NET REDEMPTION</span><b id="rt">0</b>
+                    <span style="color:#8b949e;font-size:0.9vh">NET PROFIT</span><b id="rt">0</b>
                 </div>
             </div>
             <div id="boxL" class="chart-container" style="display:none">
@@ -87,7 +88,7 @@ footer{grid-column:1/-1;text-align:center;font-size:1vh;color:#484f58;padding:10
 
         <div id="c_table" class="view">
             <div class="scroll">
-                <table><thead><tr><th>Year</th><th>Invested</th><th>Gains</th><th>Total</th></tr></thead><tbody id="tb"></tbody></table>
+                <table><thead><tr><th>Year</th><th>Capital</th><th>Growth</th><th>Total</th></tr></thead><tbody id="tb"></tbody></table>
             </div>
         </div>
 
@@ -95,11 +96,11 @@ footer{grid-column:1/-1;text-align:center;font-size:1vh;color:#484f58;padding:10
 
         <div class="grid">
             <div class="stat">Total Invested<span id="ri" style="color:var(--s)">0</span></div>
-            <div class="stat">Net Profit (SIP)<span id="rg" style="color:var(--p)">0</span></div>
+            <div class="stat">Investment Profit<span id="rg" style="color:var(--p)">0</span></div>
             <div class="stat">Accumulation Gain<span id="rag" style="color:var(--t)">0</span></div>
-            <div class="stat">Estimated Tax <i class="info-btn" onclick="alert('Tax calculated on combined SIP and Accumulation profits.')">i</i><span id="rx" style="color:#ff4d4d">0</span></div>
-            <div class="stat">Maturity Value<span id="rs">0</span></div>
-            <div class="stat">Tax-Neutral Wait <i class="info-btn" onclick="alert('Extra holding time required for growth to cover the tax bill.')">i</i><span id="rtw" style="color:var(--p)">0</span></div>
+            <div class="stat">Estimated Tax <i class="info-btn" onclick="alert('Simulation of tax on combined profits.')">i</i><span id="rx" style="color:#ff4d4d">0</span></div>
+            <div class="stat">Gross Value<span id="rs">0</span></div>
+            <div class="stat">Tax-Neutral Wait <i class="info-btn" onclick="alert('Time needed for market growth to offset total tax.')">i</i><span id="rtw" style="color:var(--p)">0</span></div>
         </div>
     </div>
 
@@ -109,7 +110,10 @@ footer{grid-column:1/-1;text-align:center;font-size:1vh;color:#484f58;padding:10
         <label><input type="radio" name="c" value="€"><span>€ EUR</span></label>
     </div>
 
-    <footer>Fact-based mathematical projections. Not financial advice.</footer>
+    <footer>
+        FOR EDUCATIONAL PURPOSES ONLY.<br>
+        Steady growth depends on market conditions. This simulation uses historical compounding logic.
+    </footer>
 </div>
 
 <script>
@@ -117,40 +121,40 @@ const _=id=>document.getElementById(id); let cD, cL, cB;
 
 const run=()=>{
     const cur=document.querySelector('input[name="c"]:checked').value, 
-          m=+_('i1').value, rPa=+_('i2').value, r=rPa/1200, ySIP=+_('i3').value, yAcc=+_('iWait').value, tx=+_('i4').value/100;
+          m=+_('i1').value, rPa=+_('i2').value, r=rPa/1200, yInv=+_('i3').value, yAcc=+_('iWait').value, tx=+_('i4').value/100;
     const f=v=>cur+Math.round(v).toLocaleString('en-IN');
     
     let h='', labs=[], dI=[], dV=[];
-    let currentWealth = 0, wealthAtEndOfSIP = 0;
-    const totalYears = ySIP + yAcc;
+    let currentWealth = 0, wealthAtEndOfPhase = 0;
+    const totalYears = yInv + yAcc;
 
     for(let i=1; i<=totalYears; i++){
-        if(i <= ySIP) {
+        if(i <= yInv) {
             let n = i * 12;
             currentWealth = m * ((Math.pow(1+r,n)-1)/r) * (1+r);
             dI.push(m * n);
-            if(i == ySIP) wealthAtEndOfSIP = currentWealth;
+            if(i == yInv) wealthAtEndOfPhase = currentWealth;
         } else {
             currentWealth = currentWealth * Math.pow(1+r, 12);
-            dI.push(m * ySIP * 12);
+            dI.push(m * yInv * 12);
         }
-        let invNow = dI[i-1], tag = i > ySIP ? '<span class="acc-tag">Accumulation</span>' : '';
+        let invNow = dI[i-1], tag = i > yInv ? '<span class="acc-tag">Accumulation</span>' : '';
         h += `<tr><td>Yr ${i}${tag}</td><td>${f(invNow)}</td><td>${f(currentWealth-invNow)}</td><td>${f(currentWealth)}</td></tr>`;
         labs.push('Y'+i); dV.push(Math.round(currentWealth));
     }
 
-    const invT = m * ySIP * 12, lastV = dV[totalYears-1] || 0;
-    const netProfitSIP = wealthAtEndOfSIP - invT;
-    const accumulationGain = lastV - wealthAtEndOfSIP;
+    const invT = m * yInv * 12, lastV = dV[totalYears-1] || 0;
+    const profitInv = wealthAtEndOfPhase - invT;
+    const profitAcc = lastV - wealthAtEndOfPhase;
     const totalGain = lastV - invT, tax = totalGain * tx, netRedemption = lastV - tax;
 
     let extraMonths = (tax > 0 && lastV > 0 && r > 0) ? Math.ceil(Math.log(1 + (tax / lastV)) / Math.log(1 + r)) : 0;
     _('rtw').innerText = `${Math.floor(extraMonths/12)}y ${extraMonths%12}m`;
 
-    _('v1').innerText=f(m); _('v2').innerText=_('i2').value+'%'; _('v3').innerText=ySIP+'Y'; 
+    _('v1').innerText=f(m); _('v2').innerText=_('i2').value+'%'; _('v3').innerText=yInv+'Y'; 
     _('vWait').innerText=yAcc+'Y'; _('v4').innerText=_('i4').value+'%';
-    _('rt').innerText=f(netRedemption); _('ri').innerText=f(invT); _('rg').innerText=f(netProfitSIP); 
-    _('rag').innerText=f(accumulationGain); _('rx').innerText=f(tax); _('rs').innerText=f(lastV);
+    _('rt').innerText=f(netRedemption); _('ri').innerText=f(invT); _('rg').innerText=f(profitInv); 
+    _('rag').innerText=f(profitAcc); _('rx').innerText=f(tax); _('rs').innerText=f(lastV);
     _('tb').innerHTML=h;
 
     if(cD)cD.destroy();
@@ -160,7 +164,7 @@ const run=()=>{
     cL=new Chart(_('chtL'),{type:'line',data:{labels:labs,datasets:[{data:dV,borderColor:'#10b981',fill:true,backgroundColor:'rgba(16,185,129,0.1)',tension:0.3},{data:dI,borderColor:'#3b82f6',borderDash:[5,5]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false},ticks:{font:{size:9}}}}}});
 
     if(cB)cB.destroy();
-    cB=new Chart(_('chtB'),{type:'bar',data:{labels:['Breakdown'],datasets:[{label:'Invested',data:[invT],backgroundColor:'#3b82f6',stack:'s'},{label:'SIP Profit',data:[netProfitSIP],backgroundColor:'#10b981',stack:'s'},{label:'Acc. Bonus',data:[accumulationGain],backgroundColor:'#f59e0b',stack:'s'},{label:'Net Value',data:[netRedemption],backgroundColor:'#fff',stack:'r'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#8b949e',boxWidth:10,font:{size:10}}}},scales:{y:{stacked:true,display:false},x:{stacked:true,grid:{display:false},ticks:{display:false}}}}});
+    cB=new Chart(_('chtB'),{type:'bar',data:{labels:['Wealth Segments'],datasets:[{label:'Invested Capital',data:[invT],backgroundColor:'#3b82f6',stack:'s'},{label:'Phase 1 Growth',data:[profitInv],backgroundColor:'#10b981',stack:'s'},{label:'Accumulation Bonus',data:[profitAcc],backgroundColor:'#f59e0b',stack:'s'},{label:'In-Hand Value',data:[netRedemption],backgroundColor:'#fff',stack:'r'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#8b949e',boxWidth:10,font:{size:10}}}},scales:{y:{stacked:true,display:false},x:{stacked:true,grid:{display:false},ticks:{display:false}}}}});
 };
 
 ['i1','i2','i3','iWait','i4'].forEach(x=>_(x).oninput=run);
