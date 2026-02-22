@@ -8,7 +8,7 @@
 :root{--p:#10b981;--s:#3b82f6;--t:#f59e0b;--bg:#0a0c10;--c:#161b22}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;font:1.4vh 'Inter',sans-serif;background:var(--bg);color:#e6edf3;display:flex;justify-content:center;padding:15px}
-.app{width:100%;max-width:950px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.app{width:100%;max-width:950px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
 .panel{background:var(--c);padding:20px;border-radius:24px;border:1px solid #30363d;display:flex;flex-direction:column}
 header{grid-column:1/-1;text-align:center}
 h1{margin:0;font-size:3vh;color:#fff}
@@ -27,9 +27,10 @@ table{width:100%;border-collapse:collapse;font-size:1.1vh}
 th{position:sticky;top:0;background:#21262d;padding:10px;text-align:left;color:var(--p)}
 td{padding:10px;border-bottom:1px solid #30363d}
 .grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:8px;margin-top:auto}
-.stat{background:rgba(255,255,255,0.02);padding:10px;border-radius:12px;text-align:center;border:1px solid #30363d}
+.stat{background:rgba(255,255,255,0.02);padding:10px;border-radius:12px;text-align:center;border:1px solid #30363d;position:relative}
 .stat.full{grid-column: span 2}
 .stat span{font-size:1.4vh;font-weight:700;display:block;margin-top:2px}
+.info-btn{font-size:0.9vh;cursor:pointer;color:var(--s);border:1px solid var(--s);border-radius:50%;width:12px;height:12px;display:inline-flex;align-items:center;justify-content:center;margin-left:4px}
 .cur-wrap{grid-column:1/-1;display:flex;justify-content:center;gap:15px;margin:10px 0}
 .cur-wrap label{font-size:1vh;padding:5px 12px;background:#161b22;border-radius:8px;cursor:pointer;border:1px solid #30363d}
 .cur-wrap input:checked+span{color:var(--p);font-weight:700}
@@ -56,9 +57,9 @@ hr{border:0;border-top:1px solid #30363d;margin:15px 0 10px}
     <div class="panel">
         <div class="tabs">
             <button class="tab active" data-v="c0">Visual</button>
-            <button class="tab" data-v="c1">Yearly Table</button>
+            <button class="tab" data-v="c1">Table</button>
             <button class="tab" data-v="c2">Growth</button>
-            <button class="tab" data-v="c3">Maturity Analysis</button>
+            <button class="tab" data-v="c3">Maturity</button>
         </div>
         
         <div id="c0" class="view active">
@@ -79,7 +80,7 @@ hr{border:0;border-top:1px solid #30363d;margin:15px 0 10px}
             <div class="stat">Total Invested<span id="ri" style="color:var(--s)">0</span></div>
             <div class="stat">Net Profit (SIP)<span id="rg" style="color:var(--p)">0</span></div>
             <div class="stat">Accumulation Gain<span id="rag" style="color:var(--t)">0</span></div>
-            <div class="stat">Estimated Tax<span id="rx" style="color:#ff4d4d">0</span></div>
+            <div class="stat">Estimated Tax <i class="info-btn" onclick="alert('Calculated as: (SIP Profit + Accumulation Gain) × Tax Rate. Applied only at the point of redemption.')">i</i><span id="rx" style="color:#ff4d4d">0</span></div>
             <div class="stat full">Final Gross Maturity<span id="rs">0</span></div>
         </div>
     </div>
@@ -90,8 +91,10 @@ hr{border:0;border-top:1px solid #30363d;margin:15px 0 10px}
         <label><input type="radio" name="c" value="€"><span>€ EUR</span></label>
     </div>
 
-    <footer>DISCLAIMER: For educational use only. Calculations based on user-defined growth rates.</footer>
+    <footer>Fact-based mathematical projections. Not financial advice.</footer>
 </div>
+
+
 
 <script>
 const _=id=>document.getElementById(id); let cD, cL, cB;
@@ -102,8 +105,7 @@ const run=()=>{
     const f=v=>cur+Math.round(v).toLocaleString('en-IN');
     
     let h='', labs=[], dI=[], dV=[];
-    let currentWealth = 0;
-    let wealthAtEndOfSIP = 0;
+    let currentWealth = 0, wealthAtEndOfSIP = 0;
     const totalYears = ySIP + yAcc;
 
     for(let i=1; i<=totalYears; i++){
@@ -116,32 +118,20 @@ const run=()=>{
             currentWealth = currentWealth * Math.pow(1+r, 12);
             dI.push(m * ySIP * 12);
         }
-        let invNow = dI[i-1];
-        let tag = i > ySIP ? '<span class="acc-tag">Accumulation</span>' : '';
+        let invNow = dI[i-1], tag = i > ySIP ? '<span class="acc-tag">Accumulation</span>' : '';
         h += `<tr><td>Yr ${i}${tag}</td><td>${f(invNow)}</td><td>${f(currentWealth-invNow)}</td><td>${f(currentWealth)}</td></tr>`;
         labs.push('Y'+i); dV.push(Math.round(currentWealth));
     }
 
-    const invT = m * ySIP * 12;
-    const lastV = dV[totalYears-1] || 0;
-    
-    // Logic for new boxes
+    const invT = m * ySIP * 12, lastV = dV[totalYears-1] || 0;
     const netProfitSIP = wealthAtEndOfSIP - invT;
     const accumulationGain = lastV - wealthAtEndOfSIP;
-    const totalGain = lastV - invT;
-    const tax = totalGain * tx;
-    const netRedemption = lastV - tax;
+    const totalGain = lastV - invT, tax = totalGain * tx, netRedemption = lastV - tax;
 
     _('v1').innerText=f(m); _('v2').innerText=_('i2').value+'%'; _('v3').innerText=ySIP+'Y'; 
     _('vWait').innerText=yAcc+'Y'; _('v4').innerText=_('i4').value+'%';
-    
-    _('rt').innerText=f(netRedemption); 
-    _('ri').innerText=f(invT); 
-    _('rg').innerText=f(netProfitSIP); 
-    _('rag').innerText=f(accumulationGain);
-    _('rx').innerText=f(tax); 
-    _('rs').innerText=f(lastV);
-    
+    _('rt').innerText=f(netRedemption); _('ri').innerText=f(invT); _('rg').innerText=f(netProfitSIP); 
+    _('rag').innerText=f(accumulationGain); _('rx').innerText=f(tax); _('rs').innerText=f(lastV);
     _('tb').innerHTML=h;
 
     if(cD)cD.destroy();
@@ -154,17 +144,18 @@ const run=()=>{
     cB=new Chart(_('chtB'),{
         type:'bar',
         data:{
-            labels:['Analysis'],
+            labels:['Breakdown'],
             datasets:[
-                {label:'Invested', data:[invT], backgroundColor:'#3b82f6', borderRadius:5},
-                {label:'Gross', data:[lastV], backgroundColor:'#fff', borderRadius:5},
-                {label:'In-Hand', data:[netRedemption], backgroundColor:'#10b981', borderRadius:5}
+                {label:'Invested', data:[invT], backgroundColor:'#3b82f6', stack:'s'},
+                {label:'SIP Profit', data:[netProfitSIP], backgroundColor:'#10b981', stack:'s'},
+                {label:'Acc. Bonus', data:[accumulationGain], backgroundColor:'#f59e0b', stack:'s'},
+                {label:'In-Hand (Post-Tax)', data:[netRedemption], backgroundColor:'#fff', stack:'r'}
             ]
         },
         options:{
             responsive:true, maintainAspectRatio:false,
             plugins:{legend:{display:true, labels:{color:'#8b949e', boxWidth:10, font:{size:10}}}},
-            scales:{y:{display:false}, x:{grid:{display:false}, ticks:{display:false}}}
+            scales:{y:{stacked:true, display:false}, x:{stacked:true, grid:{display:false}, ticks:{display:false}}}
         }
     });
 };
