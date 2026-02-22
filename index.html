@@ -2,135 +2,161 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>WealthArc SIP</title>
+<title>PureCalc SIP | Fact-Based Data</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-/* App-Style Variable Architecture */
-:root { --p: #00ffa3; --s: #00d4ff; --bg: #05070a; --glass: rgba(255,255,255,0.06); }
+:root { --p: #10b981; --s: #3b82f6; --bg: #0a0c10; --card: #161b22; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; font: 1.6vh 'Segoe UI', sans-serif; background: var(--bg); color: #fff; overflow-x: hidden; }
+body { margin: 0; font: 1.5vh 'Inter', sans-serif; background: var(--bg); color: #e6edf3; line-height: 1.6; }
 
-/* Mobile-First Grid Layout */
-.app-shell { display: flex; flex-direction: column; min-height: 100vh; padding: 20px; gap: 20px; max-width: 500px; margin: auto; }
-@media (min-width: 800px) { .app-shell { max-width: 1000px; flex-direction: row; align-items: center; } }
+.app-wrapper { max-width: 1000px; margin: auto; padding: 20px; }
+header { text-align: center; margin-bottom: 3vh; }
+header h1 { font-size: 3.5vh; margin: 0; color: #fff; }
+.tagline { color: var(--p); font-weight: 500; font-size: 1.5vh; opacity: 0.8; }
 
-/* UI Components */
-.panel { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 28px; flex: 1; backdrop-filter: blur(10px); }
-h1 { font-size: 3vh; font-weight: 800; margin: 0 0 3vh; background: linear-gradient(to right, #fff, var(--s)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.main-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+.panel { background: var(--card); padding: 25px; border-radius: 24px; border: 1px solid #30363d; }
 
-/* Shorthand Input Styles */
-.row { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; color: #a1a1aa; }
-.val { color: var(--s); }
-input[type=range] { width: 100%; height: 4px; background: #27272a; border-radius: 2px; appearance: none; margin-bottom: 25px; outline: none; }
-input[type=range]::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px var(--s); cursor: pointer; }
+/* Tabs */
+.tabs { display: flex; background: #000; padding: 5px; border-radius: 12px; margin-bottom: 20px; }
+.tab-btn { flex: 1; padding: 10px; border: none; background: none; color: #8b949e; cursor: pointer; border-radius: 8px; font-weight: 600; }
+.tab-btn.active { background: #30363d; color: #fff; }
+.content { display: none; }
+.content.active { display: block; }
 
-/* Visual Display */
-.viz { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-#chartBox { width: 100%; max-height: 35vh; }
-.center-data { position: absolute; top: 40%; transform: translateY(-50%); text-align: center; }
-.center-data small { color: #71717a; font-size: 1.4vh; text-transform: uppercase; letter-spacing: 1px; }
-.center-data div { font-size: 3vh; font-weight: 900; color: #fff; }
+/* Table Styling */
+.table-scroll { max-height: 300px; overflow-y: auto; border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 1.3vh; }
+th { position: sticky; top: 0; background: #21262d; padding: 12px; text-align: left; }
+td { padding: 12px; border-bottom: 1px solid #30363d; }
 
-/* Grid Stats */
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; margin-top: 20px; }
-.stat { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 18px; border-left: 4px solid var(--p); }
-.stat.blue { border-left-color: var(--s); }
-.stat label { font-size: 1.2vh; color: #71717a; display: block; }
-.stat b { font-size: 2vh; }
+/* Inputs & Viz */
+.label-row { display: flex; justify-content: space-between; margin: 15px 0 8px; font-size: 1.3vh; color: #8b949e; }
+.label-row b { color: var(--s); }
+input[type=range] { width: 100%; height: 4px; background: #30363d; appearance: none; border-radius: 10px; }
+input[type=range]::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; background: #fff; border-radius: 50%; border: 2px solid var(--p); }
 
-.cur-btns { display: flex; gap: 10px; margin-bottom: 20px; }
-.cur-btns input { display: none; }
-.cur-btns label { flex: 1; text-align: center; padding: 10px; background: var(--glass); border-radius: 12px; cursor: pointer; border: 1px solid transparent; transition: 0.3s; }
-.cur-btns input:checked + label { border-color: var(--p); background: rgba(0,255,163,0.1); color: var(--p); }
+.viz-box { position: relative; display: flex; justify-content: center; align-items: center; min-height: 250px; }
+.center-val { position: absolute; text-align: center; }
+.center-val div { font-size: 2.8vh; font-weight: 800; }
+
+.cur-nav { display: flex; gap: 8px; margin-bottom: 20px; }
+.cur-nav input { display: none; }
+.cur-nav label { flex: 1; text-align: center; padding: 8px; background: #21262d; border-radius: 8px; cursor: pointer; font-size: 1.2vh; border: 1px solid transparent; }
+.cur-nav input:checked + label { border-color: var(--p); color: var(--p); }
+
+footer { margin-top: 4vh; text-align: center; padding: 20px; font-size: 1.1vh; color: #484f58; border-top: 1px solid #30363d; }
 </style>
 </head>
 <body>
 
-<div class="app-shell">
-    <div class="panel">
-        <h1>WealthArc</h1>
-        
-        <div class="cur-btns">
-            <input type="radio" name="c" id="c1" value="$"><label for="c1">$</label>
-            <input type="radio" name="c" id="c2" value="₹" checked><label for="c2">₹</label>
-            <input type="radio" name="c" id="c3" value="€"><label for="c3">€</label>
+<div class="app-wrapper">
+    <header>
+        <h1>PureCalc SIP</h1>
+        <div class="tagline">Genuine • Practical • Fact-Based Returns</div>
+    </header>
+
+    <div class="main-grid">
+        <div class="panel">
+            <div class="cur-nav">
+                <input type="radio" name="c" id="c1" value="$"><label for="c1">$ USD</label>
+                <input type="radio" name="c" id="c2" value="₹" checked><label for="c2">₹ INR</label>
+                <input type="radio" name="c" id="c3" value="€"><label for="c3">€ EUR</label>
+            </div>
+
+            <div class="label-row"><span>Monthly Investment</span><b id="v1"></b></div>
+            <input type="range" id="i1" min="500" max="100000" step="500" value="5000">
+
+            <div class="label-row"><span>Expected Return (p.a)</span><b id="v2"></b></div>
+            <input type="range" id="i2" min="1" max="25" step="0.5" value="12">
+
+            <div class="label-row"><span>Duration (Years)</span><b id="v3"></b></div>
+            <input type="range" id="i3" min="1" max="40" value="10">
         </div>
 
-        <div class="row"><span>Monthly Deposit</span><span class="val" id="ov1"></span></div>
-        <input type="range" id="i1" min="500" max="100000" step="500" value="10000">
+        <div class="panel">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="setTab(0)">Visual</button>
+                <button class="tab-btn" onclick="setTab(1)">Yearly Table</button>
+            </div>
 
-        <div class="row"><span>Annual Return (%)</span><span class="val" id="ov2"></span></div>
-        <input type="range" id="i2" min="1" max="30" step="0.5" value="12">
+            <div id="tab-0" class="content active">
+                <div class="viz-box">
+                    <canvas id="chart"></canvas>
+                    <div class="center-val">
+                        <span style="font-size:1vh;color:#8b949e">EST. WEALTH</span>
+                        <div id="res-t">0</div>
+                    </div>
+                </div>
+            </div>
 
-        <div class="row"><span>Duration (Years)</span><span class="val" id="ov3"></span></div>
-        <input type="range" id="i3" min="1" max="40" value="15">
+            <div id="tab-1" class="content">
+                <div class="table-scroll">
+                    <table>
+                        <thead><tr><th>Year</th><th>Investment</th><th>Wealth</th></tr></thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="panel viz">
-        <div id="chartBox"><canvas id="canvas"></canvas></div>
-        <div class="center-data">
-            <small>Maturity Value</small>
-            <div id="res-total">0</div>
-        </div>
-        
-        <div class="grid">
-            <div class="stat blue"><label>Invested</label><b id="res-inv">0</b></div>
-            <div class="stat"><label>Est. Gains</label><b id="res-gain">0</b></div>
-        </div>
-    </div>
+    <footer>
+        <strong>DISCLAIMER:</strong> This tool is for educational purposes. SIP returns are subject to market volatility. 
+        Calculations are based on fixed growth assumptions.
+    </footer>
 </div>
 
 <script>
 const _ = id => document.getElementById(id);
-let myChart;
+let chart;
 
-const run = () => {
-    // Shorthand Logic
-    const curr = document.querySelector('input[name="c"]:checked').value;
-    const p = parseFloat(_('i1').value), 
-          r = parseFloat(_('i2').value)/1200, 
-          n = parseFloat(_('i3').value)*12;
-
-    const total = p * ((Math.pow(1+r, n) - 1) / r) * (1+r);
-    const invested = p * n;
-    const gains = total - invested;
-
-    // UI Updates
-    const fmt = v => curr + Math.round(v).toLocaleString();
-    _('ov1').innerText = fmt(p);
-    _('ov2').innerText = _('i2').value + '%';
-    _('ov3').innerText = _('i3').value + 'y';
-    _('res-total').innerText = fmt(total);
-    _('res-inv').innerText = fmt(invested);
-    _('res-gain').innerText = fmt(gains);
-
-    // Ultra-Thin Chart Update
-    if (myChart) myChart.destroy();
-    myChart = new Chart(_('canvas'), {
-        type: 'doughnut',
-        data: {
-            datasets: [{
-                data: [invested, gains],
-                backgroundColor: ['#00d4ff', '#00ffa3'],
-                borderWidth: 0,
-                borderRadius: 10,
-                hoverOffset: 0
-            }]
-        },
-        options: {
-            cutout: '90%', // Thinner look
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: { legend: { display: false }, tooltip: { enabled: true } }
-        }
+const setTab = (i) => {
+    document.querySelectorAll('.tab-btn, .content').forEach((el, idx) => {
+        el.classList.toggle('active', (idx % 2 === i));
     });
 };
 
-// Bind Events
-['i1','i2','i3'].forEach(x => _(x).oninput = run);
-document.getElementsByName('c').forEach(x => x.onchange = run);
-run(); // Initial boot
-</script>
+const calc = () => {
+    const cur = document.querySelector('input[name="c"]:checked').value;
+    const m = parseFloat(_('i1').value), r = parseFloat(_('i2').value)/1200, y = parseFloat(_('i3').value);
+    
+    const fmt = v => cur + Math.round(v).toLocaleString('en-IN');
+    _('v1').innerText = fmt(m);
+    _('v2').innerText = _('i2').value + '%';
+    _('v3').innerText = y + 'Y';
 
+    let tableHtml = '';
+    let lastTotal = 0;
+
+    for(let i=1; i<=y; i++) {
+        let n = i * 12;
+        let yearlyTotal = m * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+        let yearlyInv = m * n;
+        tableHtml += `<tr><td>Year ${i}</td><td>${fmt(yearlyInv)}</td><td>${fmt(yearlyTotal)}</td></tr>`;
+        if(i === y) lastTotal = yearlyTotal;
+    }
+
+    _('res-t').innerText = fmt(lastTotal);
+    _('table-body').innerHTML = tableHtml;
+
+    // Chart logic
+    const inv = m * y * 12;
+    const gain = lastTotal - inv;
+    if(chart) chart.destroy();
+    chart = new Chart(_('chart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Invested', 'Gains'],
+            datasets: [{ data: [inv, gain], backgroundColor: ['#3b82f6', '#10b981'], borderWidth: 0 }]
+        },
+        options: { cutout: '90%', plugins: { legend: { display: false } } }
+    });
+};
+
+['i1','i2','i3'].forEach(id => _(id).oninput = calc);
+document.getElementsByName('c').forEach(el => el.onchange = calc);
+calc();
+</script>
 </body>
 </html>
