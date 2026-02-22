@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Learning Center | PureCalc Pro</title>
+    <style>
+        :root{--p:#10b981;--s:#3b82f6;--t:#f59e0b;--bg:#0a0c10;--c:#161b22;--border:#30363d;--text:#e6edf3}
+        body{margin:0;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+        .progress-container{position:fixed;top:0;width:100%;height:8px;background:#111;z-index:1000}
+        .progress-bar{height:100%;background:var(--p);width:0%;transition:0.2s}
+        .header{padding:60px 20px;text-align:center;background:linear-gradient(to bottom, #161b22, #0a0c10)}
+        .read-time{color:var(--t);font-weight:bold;font-size:0.9rem;margin-top:10px}
+        .content{max-width:800px;margin:0 auto;padding:20px}
+        section{margin-bottom:100px;padding:30px;border-radius:20px;background:var(--c);border:1px solid var(--border);opacity:0.3;transition:0.5s}
+        section.active{opacity:1;border-color:var(--p)}
+        h2{color:var(--p);margin-top:0}
+        .example-box{position:sticky;top:30px;background:var(--p);color:#000;padding:15px;border-radius:12px;margin-bottom:20px;font-weight:bold;z-index:10}
+        .highlight{color:var(--s);font-weight:bold}
+        .btn-home{display:inline-block;margin-top:40px;padding:12px 25px;background:var(--p);color:#000;text-decoration:none;border-radius:25px;font-weight:bold}
+        .locked-notice{font-size:0.8rem;color:var(--t);margin-top:10px;display:none}
+    </style>
+</head>
+<body>
+
+<div class="progress-container"><div class="progress-bar" id="pBar"></div></div>
+
+<div class="header">
+    <h1>Financial Mastery Path</h1>
+    <div class="read-time" id="timeEst">Calculating read time...</div>
+    <p>Follow the story of Rahul to understand how wealth is built and protected.</p>
+</div>
+
+<div class="content">
+    <div class="example-box" id="tracker">
+        Current Plan: Rahul invests ₹0 at 0% for 0 years.
+    </div>
+
+    <section id="s1" data-time="5">
+        <h2>1. The Seed: Annual Investment</h2>
+        <p>Meet Rahul. He is 30 years old and decides to save <span class="highlight">₹1,20,000 every year</span> (₹10,000/month). This is his <b>Principal Investment</b>.</p>
+        <p>Think of this as the fuel for your wealth engine. The more fuel you add, the further you go.</p>
+    </section>
+
+    <section id="s2" data-time="5">
+        <h2>2. The Engine: Expected Growth</h2>
+        <p>Rahul puts his money in a diversified portfolio expecting <span class="highlight">12% returns</span>. This is the power of compounding. In the early years, the growth is small, but after year 10, the "Interest on Interest" starts to explode.</p>
+        
+    </section>
+
+    <section id="s3" data-time="5">
+        <h2>3. The Patience: Accumulation Phase</h2>
+        <p>Rahul stops investing after 10 years but <span class="highlight">doesn't touch the money</span> for another 5 years. This is the <b>Accumulation Phase</b>. During this time, his existing money works 24/7 without him adding a single rupee.</p>
+    </section>
+
+    <section id="s4" data-time="7">
+        <h2>4. The Harvest: SWP (Yearly)</h2>
+        <p>Now Rahul wants to retire. He uses a <b>Systematic Withdrawal Plan (SWP)</b>. He decides to withdraw 3% of his total wealth every year to live his life. This allows his main balance to keep growing even while he spends!</p>
+    </section>
+
+    <section id="s5" data-time="6">
+        <h2>5. The Silent Killer: Inflation</h2>
+        <p>If Rahul needs ₹50,000 today, he will need ₹1,32,000 in 20 years just to buy the same groceries. Our calculator uses an <b>Inflation Adjustment</b> to increase his withdrawals automatically so his lifestyle never drops.</p>
+    </section>
+
+    <section id="s6" data-time="8">
+        <h2>6. The Reality Check: Stress Test</h2>
+        <p>Markets are volatile. What if Rahul retires and the market <span class="highlight">crashes by 20%</span> in his first year? This is the <b>Stress Test</b>. It calculates if his money will still last until he is 100 years old despite a terrible start.</p>
+        
+    </section>
+
+    <div style="text-align: center; padding-bottom: 100px;">
+        <h2 id="finalMsg">Keep reading to finish...</h2>
+        <a href="index.html" class="btn-home">Back to Calculator</a>
+    </div>
+</div>
+
+<script>
+    const sections = document.querySelectorAll('section');
+    const pBar = document.getElementById('pBar');
+    const tracker = document.getElementById('tracker');
+    
+    // 1. Calculate Read Time (Avg 200 words per minute)
+    const totalWords = document.body.innerText.split(' ').length;
+    const minutes = Math.ceil(totalWords / 200);
+    document.getElementById('timeEst').innerText = `⏱️ Estimated Read Time: ${minutes} Minute${minutes > 1 ? 's' : ''}`;
+
+    // 2. Anti-Cheat Logic & Progress
+    const sectionData = Array.from(sections).map(s => ({
+        id: s.id,
+        minTime: parseInt(s.dataset.time) * 1000, // seconds to ms
+        startTime: null,
+        completed: false
+    }));
+
+    const updateTracker = (step) => {
+        const plans = [
+            "Current Plan: Rahul starts with ₹0.",
+            "Plan: Rahul invests ₹1.2L per year.",
+            "Plan: Rahul earns 12% compounding growth.",
+            "Plan: Rahul waits 5 years for maximum growth.",
+            "Plan: Rahul starts taking yearly income (SWP).",
+            "Plan: Rahul adjusts income for Inflation.",
+            "Plan: Rahul survives a 20% Market Crash!"
+        ];
+        tracker.innerText = plans[step] || plans[plans.length-1];
+    };
+
+    window.addEventListener('scroll', () => {
+        let completedCount = 0;
+        
+        sections.forEach((sec, idx) => {
+            const rect = sec.getBoundingClientRect();
+            
+            // If section is in view
+            if (rect.top < window.innerHeight * 0.7 && rect.bottom > 0) {
+                sec.classList.add('active');
+                
+                if (!sectionData[idx].startTime) {
+                    sectionData[idx].startTime = Date.now();
+                }
+                
+                // Check if they stayed long enough
+                if (!sectionData[idx].completed) {
+                    const timeSpent = Date.now() - sectionData[idx].startTime;
+                    if (timeSpent > sectionData[idx].minTime) {
+                        sectionData[idx].completed = true;
+                        updateTracker(idx + 1);
+                    }
+                }
+            }
+
+            if (sectionData[idx].completed) completedCount++;
+        });
+
+        const progress = (completedCount / sections.length) * 100;
+        pBar.style.width = progress + '%';
+        
+        if(progress === 100) {
+            document.getElementById('finalMsg').innerText = "🎉 Congratulations! You are now financially literate.";
+            document.getElementById('finalMsg').style.color = "var(--p)";
+        }
+    });
+</script>
+</body>
+</html>
