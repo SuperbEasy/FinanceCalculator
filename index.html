@@ -1,162 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>PureCalc SIP | Fact-Based Data</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PureCalc SIP</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-:root { --p: #10b981; --s: #3b82f6; --bg: #0a0c10; --card: #161b22; }
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; font: 1.5vh 'Inter', sans-serif; background: var(--bg); color: #e6edf3; line-height: 1.6; }
-
-.app-wrapper { max-width: 1000px; margin: auto; padding: 20px; }
-header { text-align: center; margin-bottom: 3vh; }
-header h1 { font-size: 3.5vh; margin: 0; color: #fff; }
-.tagline { color: var(--p); font-weight: 500; font-size: 1.5vh; opacity: 0.8; }
-
-.main-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
-.panel { background: var(--card); padding: 25px; border-radius: 24px; border: 1px solid #30363d; }
-
-/* Tabs */
-.tabs { display: flex; background: #000; padding: 5px; border-radius: 12px; margin-bottom: 20px; }
-.tab-btn { flex: 1; padding: 10px; border: none; background: none; color: #8b949e; cursor: pointer; border-radius: 8px; font-weight: 600; }
-.tab-btn.active { background: #30363d; color: #fff; }
-.content { display: none; }
-.content.active { display: block; }
-
-/* Table Styling */
-.table-scroll { max-height: 300px; overflow-y: auto; border-radius: 12px; }
-table { width: 100%; border-collapse: collapse; font-size: 1.3vh; }
-th { position: sticky; top: 0; background: #21262d; padding: 12px; text-align: left; }
-td { padding: 12px; border-bottom: 1px solid #30363d; }
-
-/* Inputs & Viz */
-.label-row { display: flex; justify-content: space-between; margin: 15px 0 8px; font-size: 1.3vh; color: #8b949e; }
-.label-row b { color: var(--s); }
-input[type=range] { width: 100%; height: 4px; background: #30363d; appearance: none; border-radius: 10px; }
-input[type=range]::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; background: #fff; border-radius: 50%; border: 2px solid var(--p); }
-
-.viz-box { position: relative; display: flex; justify-content: center; align-items: center; min-height: 250px; }
-.center-val { position: absolute; text-align: center; }
-.center-val div { font-size: 2.8vh; font-weight: 800; }
-
-.cur-nav { display: flex; gap: 8px; margin-bottom: 20px; }
-.cur-nav input { display: none; }
-.cur-nav label { flex: 1; text-align: center; padding: 8px; background: #21262d; border-radius: 8px; cursor: pointer; font-size: 1.2vh; border: 1px solid transparent; }
-.cur-nav input:checked + label { border-color: var(--p); color: var(--p); }
-
-footer { margin-top: 4vh; text-align: center; padding: 20px; font-size: 1.1vh; color: #484f58; border-top: 1px solid #30363d; }
+:root{--p:#10b981;--s:#3b82f6;--t:#f59e0b;--bg:#0a0c10;--c:#161b22}
+body{margin:0;font:1.4vh 'Inter',sans-serif;background:var(--bg);color:#e6edf3;display:grid;place-items:center;min-height:100vh}
+.app{width:95vw;max-width:900px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;padding:20px}
+.panel{background:var(--c);padding:25px;border-radius:20px;border:1px solid #30363d}
+header{grid-column:1/-1;text-align:center}
+h1{margin:0;font-size:3vh;color:#fff}
+.label{display:flex;justify-content:space-between;margin-top:15px;font-size:1.2vh;color:#8b949e}
+input[type=range]{width:100%;accent-color:var(--p);margin:8px 0}
+.tabs{display:flex;background:#000;padding:4px;border-radius:10px;margin-bottom:15px}
+.tab{flex:1;padding:8px;border:none;background:none;color:#8b949e;cursor:pointer;font-size:1.2vh}
+.tab.active{background:#30363d;color:#fff;border-radius:8px}
+.viz{position:relative;display:flex;justify-content:center;align-items:center;height:240px}
+.center{position:absolute;text-align:center}
+.center b{font-size:2.5vh;display:block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px;font-size:1.2vh}
+.stat{background:rgba(255,255,255,0.03);padding:10px;border-radius:10px;text-align:center}
+.scroll{max-height:220px;overflow-y:auto;display:none}
+.scroll.active{display:block}
+table{width:100%;border-collapse:collapse}
+td,th{padding:8px;border-bottom:1px solid #30363d;text-align:left}
+footer{grid-column:1/-1;text-align:center;font-size:1vh;color:#484f58;opacity:0.7}
+input[type=radio]{display:none}
+.cur{display:flex;gap:5px}.cur label{flex:1;background:#21262d;padding:6px;text-align:center;border-radius:6px;cursor:pointer}
+.cur input:checked+label{background:var(--p);color:#000;font-weight:700}
 </style>
 </head>
 <body>
 
-<div class="app-wrapper">
-    <header>
-        <h1>PureCalc SIP</h1>
-        <div class="tagline">Genuine • Practical • Fact-Based Returns</div>
-    </header>
-
-    <div class="main-grid">
-        <div class="panel">
-            <div class="cur-nav">
-                <input type="radio" name="c" id="c1" value="$"><label for="c1">$ USD</label>
-                <input type="radio" name="c" id="c2" value="₹" checked><label for="c2">₹ INR</label>
-                <input type="radio" name="c" id="c3" value="€"><label for="c3">€ EUR</label>
-            </div>
-
-            <div class="label-row"><span>Monthly Investment</span><b id="v1"></b></div>
-            <input type="range" id="i1" min="500" max="100000" step="500" value="5000">
-
-            <div class="label-row"><span>Expected Return (p.a)</span><b id="v2"></b></div>
-            <input type="range" id="i2" min="1" max="25" step="0.5" value="12">
-
-            <div class="label-row"><span>Duration (Years)</span><b id="v3"></b></div>
-            <input type="range" id="i3" min="1" max="40" value="10">
+<div class="app">
+    <header><h1>PureCalc SIP</h1><span style="color:var(--p)">Genuine • Fact-Based • Practical</span></header>
+    
+    <div class="panel">
+        <div class="cur">
+            <input type="radio" name="c" id="c1" value="$"><label for="c1">$</label>
+            <input type="radio" name="c" id="c2" value="₹" checked><label for="c2">₹</label>
+            <input type="radio" name="c" id="c3" value="€"><label for="c3">€</label>
         </div>
-
-        <div class="panel">
-            <div class="tabs">
-                <button class="tab-btn active" onclick="setTab(0)">Visual</button>
-                <button class="tab-btn" onclick="setTab(1)">Yearly Table</button>
-            </div>
-
-            <div id="tab-0" class="content active">
-                <div class="viz-box">
-                    <canvas id="chart"></canvas>
-                    <div class="center-val">
-                        <span style="font-size:1vh;color:#8b949e">EST. WEALTH</span>
-                        <div id="res-t">0</div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-1" class="content">
-                <div class="table-scroll">
-                    <table>
-                        <thead><tr><th>Year</th><th>Investment</th><th>Wealth</th></tr></thead>
-                        <tbody id="table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+        <div class="label">Monthly Investment <b id="v1"></b></div><input type="range" id="i1" min="500" max="100000" step="500" value="10000">
+        <div class="label">Returns (p.a %) <b id="v2"></b></div><input type="range" id="i2" min="1" max="25" step=".5" value="12">
+        <div class="label">Duration (Y) <b id="v3"></b></div><input type="range" id="i3" min="1" max="40" value="10">
+        <div class="label">Tax Rate (%) <b id="v4"></b></div><input type="range" id="i4" min="0" max="30" step=".5" value="10">
     </div>
 
-    <footer>
-        <strong>DISCLAIMER:</strong> This tool is for educational purposes. SIP returns are subject to market volatility. 
-        Calculations are based on fixed growth assumptions.
-    </footer>
+    <div class="panel">
+        <div class="tabs"><button class="tab active" id="t0">Visual</button><button class="tab" id="t1">Table</button></div>
+        <div id="c0" class="viz">
+            <canvas id="chart"></canvas>
+            <div class="center"><span style="color:#8b949e">NET WEALTH</span><b id="rt">0</b></div>
+        </div>
+        <div id="c1" class="scroll"><table><thead><tr><th>Yr</th><th>Inv.</th><th>Gains</th></tr></thead><tbody id="tb"></tbody></table></div>
+        <div class="grid">
+            <div class="stat">Invested<br><span id="ri" style="color:var(--s)">0</span></div>
+            <div class="stat">Net Profit<br><span id="rg" style="color:var(--p)">0</span></div>
+            <div class="stat">Tax<br><span id="rx" style="color:var(--t)">0</span></div>
+            <div class="stat">Gross<br><span id="rs">0</span></div>
+        </div>
+    </div>
+    <footer>DISCLAIMER: For educational purposes. Fact-based math models only.</footer>
 </div>
 
 <script>
-const _ = id => document.getElementById(id);
-let chart;
-
-const setTab = (i) => {
-    document.querySelectorAll('.tab-btn, .content').forEach((el, idx) => {
-        el.classList.toggle('active', (idx % 2 === i));
-    });
-};
-
-const calc = () => {
-    const cur = document.querySelector('input[name="c"]:checked').value;
-    const m = parseFloat(_('i1').value), r = parseFloat(_('i2').value)/1200, y = parseFloat(_('i3').value);
-    
-    const fmt = v => cur + Math.round(v).toLocaleString('en-IN');
-    _('v1').innerText = fmt(m);
-    _('v2').innerText = _('i2').value + '%';
-    _('v3').innerText = y + 'Y';
-
-    let tableHtml = '';
-    let lastTotal = 0;
-
-    for(let i=1; i<=y; i++) {
-        let n = i * 12;
-        let yearlyTotal = m * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
-        let yearlyInv = m * n;
-        tableHtml += `<tr><td>Year ${i}</td><td>${fmt(yearlyInv)}</td><td>${fmt(yearlyTotal)}</td></tr>`;
-        if(i === y) lastTotal = yearlyTotal;
+const _=id=>document.getElementById(id), ct=_('chart'); let chart;
+const run=()=>{
+    const cur=document.querySelector('input[name="c"]:checked').value, m=+_('i1').value, r=+_('i2').value/1200, y=+_('i3').value, tx=+_('i4').value/100;
+    const f=v=>cur+Math.round(v).toLocaleString('en-IN');
+    let h='', g=0;
+    for(let i=1;i<=y;i++) {
+        let n=i*12, v=m*((Math.pow(1+r,n)-1)/r)*(1+r);
+        h+=`<tr><td>${i}</td><td>${f(m*n)}</td><td>${f(v-m*n)}</td></tr>`;
+        if(i==y) g=v;
     }
-
-    _('res-t').innerText = fmt(lastTotal);
-    _('table-body').innerHTML = tableHtml;
-
-    // Chart logic
-    const inv = m * y * 12;
-    const gain = lastTotal - inv;
+    const inv=m*y*12, gain=g-inv, tax=gain*tx, net=g-tax;
+    _('v1').innerText=f(m); _('v2').innerText=_('i2').value+'%'; _('v3').innerText=y+'Y'; _('v4').innerText=_('i4').value+'%';
+    _('rt').innerText=f(net); _('ri').innerText=f(inv); _('rg').innerText=f(gain-tax); _('rx').innerText=f(tax); _('rs').innerText=f(g); _('tb').innerHTML=h;
     if(chart) chart.destroy();
-    chart = new Chart(_('chart'), {
-        type: 'doughnut',
-        data: {
-            labels: ['Invested', 'Gains'],
-            datasets: [{ data: [inv, gain], backgroundColor: ['#3b82f6', '#10b981'], borderWidth: 0 }]
-        },
-        options: { cutout: '90%', plugins: { legend: { display: false } } }
-    });
+    chart=new Chart(ct,{type:'doughnut',data:{datasets:[{data:[inv,gain-tax,tax],backgroundColor:['#3b82f6','#10b981','#f59e0b'],borderWidth:0}]},options:{cutout:'90%',plugins:{legend:{display:false}}}});
 };
-
-['i1','i2','i3'].forEach(id => _(id).oninput = calc);
-document.getElementsByName('c').forEach(el => el.onchange = calc);
-calc();
+['i1','i2','i3','i4'].forEach(x=>_(x).oninput=run);
+document.getElementsByName('c').forEach(x=>x.onchange=run);
+_('t0').onclick=_('t1').onclick=e=>{
+    const isV=e.target.id=='t0';
+    _('t0').classList.toggle('active',isV); _('t1').classList.toggle('active',!isV);
+    _('c0').style.display=isV?'flex':'none'; _('c1').classList.toggle('active',!isV);
+};
+run();
 </script>
 </body>
 </html>
