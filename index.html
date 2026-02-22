@@ -2,48 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>PureCalc Pro | Wealth & Stress Test</title>
+    <title>PureCalc Pro | Wealth & SWP Expert</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root{--p:#10b981;--s:#3b82f6;--t:#f59e0b;--bg:#0a0c10;--c:#161b22;--border:#30363d;--text:#e6edf3}
+        :root{--p:#10b981;--s:#3b82f6;--t:#f59e0b;--v:#a855f7;--bg:#0a0c10;--c:#161b22;--border:#30363d;--text:#e6edf3}
         .light-mode{--bg:#f0f2f5;--c:#ffffff;--border:#d1d9e0;--text:#1a1a1a}
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
         body{margin:0;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;align-items:center;padding:15px;font-size:13px;transition:0.3s}
-        .app{width:100%;max-width:1000px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:15px}
+        .app{width:100%;max-width:1100px;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:15px}
         header{grid-column:1/-1;text-align:center;margin-bottom:10px}
         h1{margin:0;font-size:2.2rem;color:var(--text);letter-spacing:-1px}
-        .panel{background:var(--c);padding:20px;border-radius:20px;border:1px solid var(--border);display:flex;flex-direction:column;min-height:620px;overflow:hidden}
-        .label{display:flex;justify-content:space-between;align-items:center;margin-top:10px;color:#8b949e}
-        .label b{color:var(--s);font-size:1rem}
-        input[type=range]{width:100%;accent-color:var(--p);margin:8px 0;cursor:pointer}
+        .panel{background:var(--c);padding:20px;border-radius:20px;border:1px solid var(--border);display:flex;flex-direction:column;min-height:650px;overflow:hidden}
+        .label{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:#8b949e}
+        .label b{color:var(--s);font-size:0.95rem}
+        input[type=range]{width:100%;accent-color:var(--p);margin:6px 0;cursor:pointer}
         .swp-box{background:rgba(0,0,0,0.2);border:1px solid var(--border);color:var(--p);padding:4px 10px;border-radius:6px;font-weight:bold}
-        .tabs{display:flex;background:rgba(0,0,0,0.2);padding:3px;border-radius:10px;margin-bottom:15px}
-        .tab{flex:1;padding:8px;border:none;background:none;color:#8b949e;cursor:pointer;font-size:.8rem;font-weight:600}
+        .tabs{display:flex;background:rgba(0,0,0,0.2);padding:3px;border-radius:10px;margin-bottom:12px}
+        .tab{flex:1;padding:8px;border:none;background:none;color:#8b949e;cursor:pointer;font-size:.75rem;font-weight:600}
         .tab.active{background:var(--border);color:var(--text);border-radius:8px}
-        .sub-toggle{display:flex;justify-content:center;gap:12px;margin-bottom:12px;font-size:.8rem;color:#8b949e}
-        .sub-toggle input:checked+span{color:var(--p);font-weight:700}
-        .view{display:none;height:280px;width:100%;margin-bottom:15px;position:relative}
-        .view.active{display:flex;flex-direction:column;align-items:center}
-        .chart-wrap{width:100%;height:100%;position:relative;padding:10px}
-        .scroll{overflow-y:auto;width:100%;height:100%;border:1px solid var(--border);border-radius:10px}
-        table{width:100%;border-collapse:collapse;font-size:.8rem}
-        th{position:sticky;top:0;background:var(--border);padding:10px;text-align:left;color:var(--p)}
-        td{padding:10px;border-bottom:1px solid var(--border)}
-        .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto}
-        .stat{background:rgba(128,128,128,.05);padding:10px;border-radius:12px;text-align:center;border:1px solid var(--border)}
-        .stat label{font-size:.7rem;color:#8b949e;display:block}
-        .stat span{font-size:1rem;font-weight:700;display:block}
-        .swp-res{font-size:1.8rem;font-weight:800;margin:5px 0}
-        .note-orange{font-size:.75rem;color:var(--t);margin-top:4px;display:block;line-height:1.2}
-        .theme-btn{margin-top:20px;padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--c);color:var(--text);cursor:pointer;font-size:.8rem}
-        .stress-btn{background:var(--t);color:#000;border:none;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;width:100%;margin-top:10px}
-        input[type=radio]{display:none}
-        hr{border:0;border-top:1px solid var(--border);margin:12px 0 8px}
+        .view{display:none;height:300px;width:100%;margin-bottom:15px;position:relative}
+        .view.active{display:flex;flex-direction:column}
+        .chart-wrap{width:100%;height:100%;position:relative;padding:5px}
+        .scroll{overflow-y:auto;width:100%;height:100%;border:1px solid var(--border);border-radius:10px;background:rgba(0,0,0,0.1)}
+        table{width:100%;border-collapse:collapse;font-size:.75rem}
+        th{position:sticky;top:0;background:var(--border);padding:8px;text-align:left;color:var(--p);z-index:2}
+        td{padding:8px;border-bottom:1px solid var(--border)}
+        
+        /* Stats Table Style */
+        .stats-table{width:100%;margin-top:auto;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+        .stats-table td{padding:6px 10px;background:rgba(255,255,255,0.02)}
+        .stats-table .val{text-align:right;font-weight:700}
+        .stats-table .head{color:#8b949e;font-size:0.7rem;text-transform:uppercase}
+
+        .swp-res{font-size:1.8rem;font-weight:800;margin:2px 0}
+        .note-orange{font-size:.7rem;color:var(--t);display:block;line-height:1.2}
+        .stress-btn{background:var(--t);color:#000;border:none;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;margin-top:5px}
+        .info-link{color:var(--p);text-decoration:none;font-weight:bold;border:1px solid var(--p);padding:8px 16px;border-radius:30px;display:inline-block;margin:15px 0}
+        hr{border:0;border-top:1px solid var(--border);margin:10px 0}
     </style>
 </head>
 <body>
 <div class="app">
-    <header><h1>PureCalc Pro</h1><div style="color:var(--p);font-weight:600">Wealth, Inflation & Stress Test</div></header>
+    <header><h1>PureCalc Pro</h1><div style="color:var(--p);font-weight:600">Advanced Wealth Modeler</div></header>
     
     <div class="panel">
         <div class="label">Annual Investment <b id="v1"></b></div><input type="range" id="i1" min="10000" max="2000000" step="10000" value="120000">
@@ -54,131 +54,121 @@
         <div class="label">SWP (Yearly) <span id="swpVal" class="swp-box">0</span></div>
         <div class="label" style="opacity:.7">Withdrawal Rate: <b id="swpPercDisp">3%</b></div>
         <input type="range" id="iSwp" min="1" max="12" step="0.5" value="3">
-        
-        <div class="label">Expected Inflation (%) <b id="vInfl"></b></div>
-        <input type="range" id="iInfl" min="0" max="12" step="0.5" value="5">
+        <div class="label">Expected Inflation (%) <b id="vInfl"></b></div><input type="range" id="iInfl" min="0" max="12" step="0.5" value="5">
         <hr>
         <div class="label" style="opacity:.6">Tax Rate (LTCG %) <b id="v4"></b></div><input type="range" id="i4" min="0" max="30" step="0.5" value="12.5">
-        <span class="note-orange" style="text-align:right">Time to offset tax: <b id="rtw">0 Years</b></span>
-        <div style="text-align: center; margin: 20px 0;">
-
-</div>
+        <span class="note-orange" style="text-align:right">Tax Offset: <b id="rtw">0 Years</b></span>
+        
+        <table class="stats-table">
+            <tr><td class="head">Invested</td><td class="val" id="ri" style="color:var(--s)">0</td></tr>
+            <tr><td class="head">SIP Profit</td><td class="val" id="rgSIP" style="color:var(--s)">0</td></tr>
+            <tr><td class="head">Accumulation Gain</td><td class="val" id="rgAcc" style="color:var(--v)">0</td></tr>
+            <tr><td class="head">Total Profit</td><td class="val" id="rgTotal" style="color:var(--p)">0</td></tr>
+            <tr><td class="head">Tax Est.</td><td class="val" id="rx" style="color:#ff4d4d">0</td></tr>
+            <tr><td class="head">First SWP</td><td class="val" id="gridSwp" style="color:var(--p)">0</td></tr>
+        </table>
     </div>
 
     <div class="panel">
         <div class="tabs">
-            <button class="tab active" data-v="c_analysis">Analysis</button>
-            <button class="tab" data-v="c_swp">SWP/Longevity</button>
+            <button class="tab active" data-v="c_analysis">Accumulation</button>
+            <button class="tab" data-v="c_swp">SWP Longevity</button>
             <button class="tab" data-v="c_stress">Stress Test</button>
         </div>
 
         <div id="c_analysis" class="view active">
-            <div class="sub-toggle">
-                <label><input type="radio" name="viz" value="donut" checked><span>Composition</span></label>
-                <label><input type="radio" name="viz" value="graph"><span>Timeline</span></label>
-                <label><input type="radio" name="viz" value="table"><span>Table</span></label>
+            <div class="chart-wrap" style="height:180px"><canvas id="chtL"></canvas></div>
+            <div class="scroll" style="margin-top:10px">
+                <table><thead><tr><th>Year</th><th>Capital</th><th>Growth</th><th>Total</th></tr></thead><tbody id="tbAcc"></tbody></table>
             </div>
-            <div id="boxD" class="chart-wrap">
-                <canvas id="chtD"></canvas>
-                <div style="position:absolute;top:55%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;width:100%">
-                    <span style="color:#8b949e;font-size:.7rem">NET PROFIT</span><b id="rt" style="display:block;font-size:1.1rem">0</b>
-                </div>
-            </div>
-            <div id="boxL" class="chart-wrap" style="display:none"><canvas id="chtL"></canvas></div>
-            <div id="boxT" class="scroll" style="display:none"><table><thead><tr><th>Year</th><th>Capital</th><th>Growth</th><th>Total</th></tr></thead><tbody id="tb"></tbody></table></div>
         </div>
 
         <div id="c_swp" class="view" style="text-align:center">
-            <div style="color:#8b949e;margin-top:10px">Standard Longevity:</div>
             <div class="swp-res" id="swpLifeMain" style="color:var(--p)">...</div>
-            <div style="font-size:0.95rem;color:var(--s);margin-bottom:10px">Total Life Cash Out: <b id="totalSwpCash"></b></div>
-            <span id="infNote" class="note-orange" style="display:none;padding:0 20px">Mathematically grows forever based on current parameters subject to market risk.</span>
+            <span id="infNote" class="note-orange" style="display:none;margin-bottom:5px">Grows forever under current parameters.</span>
+            <div class="chart-wrap" style="height:140px"><canvas id="chtS"></canvas></div>
+            <div class="scroll" style="margin-top:10px">
+                <table><thead><tr><th>Year</th><th>Withdrawal</th><th>Balance</th></tr></thead><tbody id="tbSwp"></tbody></table>
+            </div>
         </div>
 
         <div id="c_stress" class="view" style="text-align:center">
-            <div style="color:var(--t);font-weight:700;margin-top:10px">🚨 20% Early Retirement Crash</div>
-            <p style="font-size:0.8rem;opacity:0.8;padding:0 15px">Simulates a -20% drop in Year 1 of SWP while inflation continues.</p>
+            <div style="color:var(--t);font-weight:700">🚨 20% Early Retirement Crash</div>
             <div class="swp-res" id="stressLife" style="color:var(--t)">- -</div>
-            <div style="font-size:0.85rem">Survival if market crashes early.</div>
-            <button class="stress-btn" onclick="run()">Run Crash Test</button>
+            <div id="stressNote" style="font-size:0.8rem;margin-bottom:10px">Survival if market crashes in Year 1 of SWP.</div>
+            <div class="chart-wrap" style="height:140px"><canvas id="chtC"></canvas></div>
+            <button class="stress-btn" onclick="run()">Recalculate Stress</button>
         </div>
 
-        <div class="grid">
-            <div class="stat"><label>Invested</label><span id="ri" style="color:var(--s)">0</span></div>
-            <div class="stat"><label>Total Profit</label><span id="rgTotal" style="color:var(--p)">0</span></div>
-            <div class="stat"><label>Tax Est.</label><span id="rx" style="color:#ff4d4d">0</span></div>
-            <div class="stat"><label>First SWP</label><span id="gridSwp" style="color:var(--p)">0</span></div>
+        <div style="margin-top:auto; padding:10px; background:rgba(0,0,0,0.2); border-radius:10px; text-align:center">
+            <span style="color:#8b949e;font-size:.7rem">NET WEALTH (AFTER TAX)</span>
+            <div id="rt" style="font-size:1.5rem;font-weight:800;color:var(--p)">0</div>
         </div>
     </div>
 </div>
-<button class="theme-btn" onclick="document.body.classList.toggle('light-mode')">🌓 Toggle Dark/Light Mode</button>
-<a href="information.html" style="color: var(--p); text-decoration: none; font-weight: bold; border: 1px solid var(--p); padding: 10px 20px; border-radius: 30px; transition: 0.3s;" onmouseover="this.style.background='var(--p)';this.style.color='#000'" onmouseout="this.style.background='transparent';this.style.color='var(--p)'">
-🚀 Master Your Money: How this works?</a>
-<footer>© 2026 PureCalc Modeler • Mathematically Projected</footer>
+
+<div style="text-align:center">
+    <a href="information.html" class="info-link">🚀 Master Your Money: Rahul's Story</a><br>
+    <button class="theme-btn" onclick="document.body.classList.toggle('light-mode')" style="background:none;border:1px solid var(--border);color:var(--text);padding:8px 15px;border-radius:20px;cursor:pointer">🌓 Dark/Light</button>
+</div>
 
 <script>
-    const _=id=>document.getElementById(id);let cD,cL;
+    const _=id=>document.getElementById(id); let cL, cS, cC;
     const run=()=>{
-        const cur="₹",A=+_('i1').value,rPa=+_('i2').value,r=rPa/100,yI=+_('i3').value,yA=+_('iWait').value,tx=+_('i4').value/100,sP=+_('iSwp').value/100,infl=+_('iInfl').value/100,f=v=>cur+Math.round(v).toLocaleString('en-IN');
-        let h='',labs=[],dV1=[],dV2=[],curW=0;const totY=yI+yA;
+        const cur="₹", A=+_('i1').value, rPa=+_('i2').value, r=rPa/100, yI=+_('i3').value, yA=+_('iWait').value, tx=+_('i4').value/100, sP=+_('iSwp').value/100, infl=+_('iInfl').value/100, f=v=>cur+Math.round(v).toLocaleString('en-IN');
         
-        // ACCUMULATION ENGINE
-        for(let i=1;i<=totY;i++){
-            curW=i<=yI?(curW+A)*(1+r):curW*(1+r);
-            const inv=i<=yI?A*i:A*yI;
-            h+=`<tr><td>Year ${i}</td><td>${f(inv)}</td><td>${f(curW-inv)}</td><td>${f(curW)}</td></tr>`;
-            labs.push('Y'+i);
+        // 1. Accumulation Phase
+        let hAcc='', labsAcc=[], dV1=[], dV2=[], curW=0, sipG=0, accG=0;
+        for(let i=1; i<=(yI+yA); i++){
+            let prevW = curW;
+            curW = i<=yI ? (curW+A)*(1+r) : curW*(1+r);
+            if(i<=yI) sipG += (curW - prevW - A); else accG += (curW - prevW);
+            
+            hAcc += `<tr><td>Year ${i}</td><td>${f(i<=yI?A*i:A*yI)}</td><td>${f(curW-(i<=yI?A*i:A*yI))}</td><td>${f(curW)}</td></tr>`;
+            labsAcc.push('Y'+i);
             if(i<=yI){ dV1.push(Math.round(curW)); dV2.push(null); }
             else{ dV2.push(Math.round(curW)); if(i===yI+1) dV2[i-2]=dV1[i-2]; }
         }
         
-        const invT=A*yI,gM=curW,totG=gM-invT,tX=totG>0?totG*tx:0,nM=gM-tX,sA_start=nM*sP;
-        
-        // STANDARD LONGEVITY (Inflation Adjusted)
-        let sY=0, tC=nM, tW=0, currSA=sA_start;
-        if(sA_start > 0){
-            while(tC>=currSA && sY<100){
-                tC = (tC - currSA) * (1+r);
-                tW += currSA;
-                currSA *= (1+infl);
-                sY++;
-            }
-        }
-        
-        // STRESS TEST (-20% Year 1 Crash)
-        let stY=0, stC=nM*0.8, stSA=sA_start;
-        if(stC > 0){
-            while(stC>=stSA && stY<100){
-                stC = (stC - stSA) * (1+r);
-                stSA *= (1+infl);
-                stY++;
-            }
+        const invT=A*yI, gM=curW, totG=gM-invT, tX=totG>0?totG*tx:0, nM=gM-tX, sA_start=nM*sP;
+
+        // 2. SWP Phase (Normal)
+        let hSwp='', labsSwp=[], dVS=[], sY=0, tC=nM, currSA=sA_start;
+        while(tC>=currSA && sY<50){
+            tC = (tC - currSA) * (1+r);
+            sY++;
+            hSwp += `<tr><td>Year ${sY}</td><td>${f(currSA)}</td><td>${f(tC)}</td></tr>`;
+            labsSwp.push('Y'+sY); dVS.push(Math.round(tC));
+            currSA *= (1+infl);
         }
 
-        // UI UPDATES
+        // 3. Stress Phase (-20% Crash)
+        let stY=0, stC=nM*0.8, stSA=sA_start, dVC=[], labsC=[];
+        while(stC>=stSA && stY<50){
+            stC = (stC - stSA) * (1+r);
+            stY++;
+            stSA *= (1+infl);
+            dVC.push(Math.round(stC)); labsC.push('Y'+stY);
+        }
+
+        // Update UI
         _('v1').innerText=f(A); _('v2').innerText=rPa+'%'; _('v3').innerText=yI+'Y'; _('vWait').innerText=yA+'Y'; _('v4').innerText=_('i4').value+'%'; _('vInfl').innerText=(infl*100).toFixed(1)+'%';
+        _('ri').innerText=f(invT); _('rgSIP').innerText=f(sipG); _('rgAcc').innerText=f(accG); _('rgTotal').innerText=f(totG); _('rx').innerText=f(tX); _('rt').innerText=f(nM); _('gridSwp').innerText=f(sA_start);
         _('swpVal').innerText=f(sA_start); _('swpPercDisp').innerText=(sP*100).toFixed(1)+'%';
-        _('ri').innerText=f(invT); _('rgTotal').innerText=f(totG); _('rx').innerText=f(tX); _('rt').innerText=f(nM); _('gridSwp').innerText=f(sA_start);
-        _('totalSwpCash').innerText=f(tW);
-        
-        _('swpLifeMain').innerText=sY >= 100 ? 'Infinity' : sY+' Years';
-        _('infNote').style.display=sY>=100?'block':'none';
+        _('swpLifeMain').innerText=sY >= 50 ? 'Infinity' : sY+' Years';
+        _('infNote').style.display=sY>=50?'block':'none';
         _('stressLife').innerText=stY+' Years';
-        _('tb').innerHTML=h;
-        
-        let exY=(tX>0&&gM>0&&r>0)?Math.ceil(Math.log(1+(tX/gM))/Math.log(1+r)):0;_('rtw').innerText=exY+' Years';
+        _('tbAcc').innerHTML=hAcc; _('tbSwp').innerHTML=hSwp;
+        _('rtw').innerText=((tX>0&&gM>0&&r>0)?Math.ceil(Math.log(1+(tX/gM))/Math.log(1+r)):0)+' Years';
 
-        // CHARTS
-        if(cD)cD.destroy();cD=new Chart(_('chtD'),{type:'doughnut',data:{datasets:[{data:[invT,totG-tX,tX],backgroundColor:['#3b82f6','#10b981','#f59e0b'],borderWidth:0}]},options:{cutout:'75%',layout:{padding:15},maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-        if(cL)cL.destroy();cL=new Chart(_('chtL'),{type:'line',data:{labels:labs,datasets:[{label:'Inv',data:dV1,borderColor:'#3b82f6',fill:true,backgroundColor:'rgba(59,130,246,0.1)',tension:0.3,spanGaps:true},{label:'Wait',data:dV2,borderColor:'#10b981',fill:true,backgroundColor:'rgba(16,185,129,0.1)',tension:0.3,spanGaps:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false},ticks:{color:'#8b949e'}}}}});
+        // Charts
+        if(cL)cL.destroy(); cL=new Chart(_('chtL'),{type:'line',data:{labels:labsAcc,datasets:[{label:'SIP',data:dV1,borderColor:'#3b82f6',fill:true,backgroundColor:'rgba(59,130,246,0.1)',tension:0.3,spanGaps:true},{label:'Acc',data:dV2,borderColor:'#a855f7',fill:true,backgroundColor:'rgba(168,85,247,0.1)',tension:0.3,spanGaps:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false},ticks:{color:'#8b949e'}}}}});
+        if(cS)cS.destroy(); cS=new Chart(_('chtS'),{type:'line',data:{labels:labsSwp,datasets:[{label:'Balance',data:dVS,borderColor:'#10b981',tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false}}}}});
+        if(cC)cC.destroy(); cC=new Chart(_('chtC'),{type:'line',data:{labels:labsC,datasets:[{label:'Crash',data:dVC,borderColor:'#ff4d4d',tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false}}}}});
     };
 
-    // EVENTS
     ['i1','i2','i3','iWait','i4','iSwp','iInfl'].forEach(id=>_(id).oninput=run);
-    document.getElementsByName('viz').forEach(r=>r.onchange=e=>{['boxD','boxL','boxT'].forEach(b=>_(b).style.display='none');const m={donut:'boxD',graph:'boxL',table:'boxT'};_(m[e.target.value]).style.display='block';if(cL)cL.resize();if(cD)cD.resize()});
-    document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab,.view').forEach(e=>e.classList.remove('active'));t.classList.add('active');_(t.dataset.v).classList.add('active');if(cL)cL.resize();if(cD)cD.resize();});
-    
-    // Initial Run
+    document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab,.view').forEach(e=>e.classList.remove('active'));t.classList.add('active');_(t.dataset.v).classList.add('active');if(cL)cL.resize();if(cS)cS.resize();if(cC)cC.resize();});
     run();
 </script>
 </body>
