@@ -21,11 +21,12 @@ input[type=number]{width:100%;padding:1vh;font-size:2vh;border:none;background:#
 .tab.active{background:#c5e1a5;font-weight:bold}
 .tab-content{display:none}
 .tab-content.active{display:block}
-#results{margin-top:2vh;font-size:2vh;background:#f9fbe7;padding:2vh;border-radius:8px;border:1px solid #cddc39;display:grid;grid-template-columns:1fr 1fr;gap:1vh}
-#results p{margin:0}
-#results b{text-align:right;display:block}
-#results span{text-align:left;display:block}
-canvas{width:60%;max-height:30vh;margin:auto;background:rgba(255,255,255,0.8);border-radius:8px;padding:1vh}
+#results{margin-top:2vh;font-size:2vh;background:#f9fbe7;padding:2vh;border-radius:8px;border:1px solid #cddc39}
+#results table{width:100%;border-collapse:collapse}
+#results td{padding:0.5vh 1vw;border:none}
+#results td.label{text-align:left;font-weight:bold;color:#2e7d32}
+#results td.value{text-align:right;color:#000}
+canvas{width:50%;max-height:25vh;margin:auto;background:rgba(255,255,255,0.8);border-radius:8px;padding:1vh}
 table{width:100%;border-collapse:collapse;margin-top:2vh;background:rgba(255,255,255,0.9)}
 th,td{border:1px solid #c8e6c9;padding:1vh;text-align:center;font-size:1.8vh}
 th{background:#c5e1a5;color:#1b5e20}
@@ -63,7 +64,12 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelect
 let chart;
 function calc(){
 let c=document.querySelector('input[name=currency]:checked').value,m=+$('monthlyAmount').value,r=+$('returnRate').value/100,d=+$('duration').value,t=+$('taxRate').value/100,n=d*12,i=m*n,u=m*(((Math.pow(1+r/12,n)-1)/(r/12))*(1+r/12)),ret=u-i,tax=ret*t,tot=u-tax;
-$('results').innerHTML=`<p><b>Invested:</b><span>${c}  ${i.toFixed(0)}</span></p><p><b>Returns:</b><span>${c}  ${ret.toFixed(0)}</span></p><p><b>Tax:</b><span>${c}  ${tax.toFixed(0)}</span></p><p><b>Total:</b><span>${c}  ${tot.toFixed(0)}</span></p>`;
+$('results').innerHTML=`<table>
+<tr><td class="label">Invested:</td><td class="value">${c}  ${i.toFixed(0)}</td></tr>
+<tr><td class="label">Returns:</td><td class="value">${c}  ${ret.toFixed(0)}</td></tr>
+<tr><td class="label">Tax:</td><td class="value">${c}  ${tax.toFixed(0)}</td></tr>
+<tr><td class="label">Total:</td><td class="value">${c}  ${tot.toFixed(0)}</td></tr>
+</table>`;
 if(chart)chart.destroy();
 chart=new Chart($('pieChart'),{type:'doughnut',data:{labels:['Invested','Returns','Tax'],datasets:[{data:[i,ret,tax],backgroundColor:['#2196F3','#4CAF50','#FFB74D']}]},options:{plugins:{datalabels:{formatter:(v,ctx)=>((v/ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b))*100).toFixed(0)+'%',color:'#000',font:{weight:'bold'}}}}});
 let tbl='<tr><th>Year</th><th>Invested</th><th>Value</th></tr>';for(let y=1;y<=d;y++){let v=m*(((Math.pow(1+r/12,y*12)-1)/(r/12))*(1+r/12));tbl+=`<tr><td>${y}</td><td>${c}  ${(m*y*12).toFixed(0)}</td><td>${c}  ${v.toFixed(0)}</td></tr>`}$('growthTable').innerHTML=tbl}
