@@ -1,207 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>PureCalc: Wealth & SWP Pro</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-:root{--p:#10b981;--s:#3b82f6;--t:#f59e0b;--bg:#0a0c10;--c:#161b22}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font:1.3vh 'Inter',sans-serif;background:var(--bg);color:#e6edf3;display:flex;flex-direction:column;align-items:center;padding:15px}
-.app{width:100%;max-width:1000px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
-.panel{background:var(--c);padding:20px;border-radius:24px;border:1px solid #30363d;display:flex;flex-direction:column;min-height:580px}
-header{grid-column:1/-1;text-align:center;margin-bottom:10px}
-h1{margin:0;font-size:3vh;color:#fff}
-.label{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:1.1vh;color:#8b949e}
-.label b{color:var(--s)}
-input[type=range]{width:100%;accent-color:var(--p);margin:5px 0;cursor:pointer}
-.swp-box{background:#000;border:1px solid #30363d;color:var(--p);padding:5px 12px;border-radius:8px;font-weight:bold;font-size:1.4vh}
-.tabs{display:flex;background:#000;padding:3px;border-radius:12px;margin-bottom:15px}
-.tab{flex:1;padding:8px 10px;border:none;background:none;color:#8b949e;cursor:pointer;font-size:1vh;font-weight:600}
-.tab.active{background:#30363d;color:#fff;border-radius:9px}
-.sub-toggle{display:flex;justify-content:center;gap:10px;margin-bottom:10px;font-size:1vh;color:#8b949e}
-.sub-toggle label{cursor:pointer}
-.sub-toggle input:checked + span{color:var(--p);font-weight:700}
-.view{display:none;height:280px;width:100%;margin-bottom:15px;position:relative}
-.view.active{display:flex;flex-direction:column;align-items:center}
-.chart-wrap{width:100%;height:100%;position:relative}
-.scroll{overflow-y:auto;width:100%;height:100%;border:1px solid #30363d;border-radius:12px}
-table{width:100%;border-collapse:collapse;font-size:1.1vh}
-th{position:sticky;top:0;background:#21262d;padding:10px;text-align:left;color:var(--p)}
-td{padding:10px;border-bottom:1px solid #30363d}
-.grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:8px;margin-top:auto}
-.stat{background:rgba(255,255,255,0.02);padding:10px;border-radius:12px;text-align:center;border:1px solid #30363d}
-.stat label{font-size:0.9vh;color:#8b949e;display:block;margin-bottom:4px}
-.stat span{font-size:1.4vh;font-weight:700;display:block}
-.tax-wait-hint{font-size:0.95vh;color:var(--t);margin-top:4px;display:block;text-align:right;opacity:0.8}
-.disclaimer-bottom{grid-column:1/-1;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);color:var(--t);padding:12px;border-radius:15px;font-size:1vh;text-align:center;max-width:1000px;width:100%;margin-top:20px}
-input[type=radio]{display:none}
-hr{border:0;border-top:1px solid #30363d;margin:15px 0 10px}
-.swp-res{font-size:4vh;font-weight:bold;margin:10px 0}
-.swp-small{font-size:1.2vh;display:block;opacity:0.8;font-weight:normal}
-footer{grid-column:1/-1;text-align:center;font-size:0.9vh;color:#484f58;padding:15px}
-</style>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>PureCalc Pro | Annual Wealth & Longevity</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root{--p:#10b981;--s:#3b82f6;--t:#f59e0b;--bg:#0a0c10;--c:#161b22;--border:#30363d}
+        *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+        body{margin:0;font-family:'Inter',sans-serif;background:var(--bg);color:#e6edf3;display:flex;flex-direction:column;align-items:center;padding:15px;font-size:13px}
+        .app{width:100%;max-width:1000px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:15px}
+        header{grid-column:1/-1;text-align:center;margin-bottom:10px}
+        h1{margin:0;font-size:2.2rem;color:#fff;letter-spacing:-1px}
+        .sub-head{color:var(--p);font-weight:600}
+        .panel{background:var(--c);padding:20px;border-radius:20px;border:1px solid var(--border);display:flex;flex-direction:column;min-height:580px}
+        .label{display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:#8b949e}
+        .label b{color:var(--s);font-size:1rem}
+        input[type=range]{width:100%;accent-color:var(--p);margin:8px 0;cursor:pointer}
+        .swp-box{background:#000;border:1px solid var(--border);color:var(--p);padding:4px 10px;border-radius:6px;font-weight:bold}
+        .tabs{display:flex;background:#000;padding:3px;border-radius:10px;margin-bottom:15px}
+        .tab{flex:1;padding:8px;border:none;background:none;color:#8b949e;cursor:pointer;font-size:.8rem;font-weight:600}
+        .tab.active{background:var(--border);color:#fff;border-radius:8px}
+        .sub-toggle{display:flex;justify-content:center;gap:12px;margin-bottom:12px;font-size:.8rem;color:#8b949e}
+        .sub-toggle label{cursor:pointer;display:flex;align-items:center;gap:4px}
+        .sub-toggle input:checked+span{color:var(--p);font-weight:700}
+        .view{display:none;height:280px;width:100%;margin-bottom:15px;position:relative}
+        .view.active{display:flex;flex-direction:column;align-items:center}
+        .chart-wrap{width:100%;height:100%;position:relative}
+        .scroll{overflow-y:auto;width:100%;height:100%;border:1px solid var(--border);border-radius:10px;background:#0d1117}
+        table{width:100%;border-collapse:collapse;font-size:.8rem}
+        th{position:sticky;top:0;background:#21262d;padding:10px;text-align:left;color:var(--p)}
+        td{padding:10px;border-bottom:1px solid var(--border)}
+        .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto}
+        .stat{background:rgba(255,255,255,.03);padding:10px;border-radius:12px;text-align:center;border:1px solid var(--border)}
+        .stat label{font-size:.7rem;color:#8b949e;display:block}
+        .stat span{font-size:1rem;font-weight:700;display:block}
+        .tax-wait-hint{font-size:.8rem;color:var(--t);margin-top:5px;display:block;text-align:right}
+        .disclaimer-bottom{grid-column:1/-1;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:var(--t);padding:12px;border-radius:12px;font-size:.8rem;text-align:center;margin-top:20px}
+        input[type=radio]{display:none}
+        hr{border:0;border-top:1px solid var(--border);margin:15px 0 10px}
+        .swp-res{font-size:2.2rem;font-weight:800;margin:5px 0}
+        .swp-small{font-size:.9rem;display:block;opacity:.7;font-weight:400;color:#fff}
+        footer{grid-column:1/-1;text-align:center;font-size:.75rem;color:#484f58;padding:20px}
+    </style>
 </head>
 <body>
-
 <div class="app">
-    <header><h1>PureCalc</h1><span style="color:var(--p)">Wealth Longevity & Cashflow Modeler</span></header>
-
+    <header><h1>PureCalc Pro</h1><div class="sub-head">Annual Wealth & Longevity Modeler</div></header>
     <div class="panel">
-        <div class="label">Monthly Investment <b id="v1"></b></div><input type="range" id="i1" min="500" max="100000" step="500" value="10000">
-        <div class="label">Expected Growth (%) <b id="v2"></b></div><input type="range" id="i2" min="1" max="25" step=".5" value="12">
+        <div class="label">Annual Investment <b id="v1"></b></div><input type="range" id="i1" min="10000" max="2000000" step="10000" value="120000">
+        <div class="label">Expected Growth (%) <b id="v2"></b></div><input type="range" id="i2" min="1" max="25" step="0.5" value="12">
         <div class="label">Investment Phase (Years) <b id="v3"></b></div><input type="range" id="i3" min="1" max="40" value="10">
-        <div class="label">Wealth Accumulation (Years) <b id="vWait"></b></div><input type="range" id="iWait" min="0" max="30" value="5">
+        <div class="label">Accumulation Phase <b id="vWait"></b></div><input type="range" id="iWait" min="0" max="30" value="5">
         <hr>
-        <div class="label">Monthly SWP Withdrawal <span id="swpVal" class="swp-box">0</span></div>
-        <div class="label" style="margin-top:5px; opacity:0.7">Withdrawal Rate: <b id="swpPercDisp">0.5%</b></div>
-        <input type="range" id="iSwp" min="0.1" max="3" step="0.1" value="0.5">
+        <div class="label">Annual SWP <span id="swpVal" class="swp-box">0</span></div>
+        <div class="label" style="margin-top:5px;opacity:.7">Withdrawal Rate: <b id="swpPercDisp">3%</b></div>
+        <input type="range" id="iSwp" min="1" max="12" step="0.5" value="3">
         <hr>
-        <div class="label" style="opacity:0.6">Tax Rate (LTCG %) <b id="v4"></b></div><input type="range" id="i4" min="0" max="30" step=".5" value="12.5">
-        <span class="tax-wait-hint">Time needed to offset tax: <b id="rtw">0y 0m</b></span>
+        <div class="label" style="opacity:.6">Tax Rate (LTCG %) <b id="v4"></b></div><input type="range" id="i4" min="0" max="30" step="0.5" value="12.5">
+        <span class="tax-wait-hint">Time to offset tax: <b id="rtw">0 Years</b></span>
     </div>
-
     <div class="panel">
         <div class="tabs">
             <button class="tab active" data-v="c_analysis">Analysis</button>
             <button class="tab" data-v="c_maturity">Maturity</button>
             <button class="tab" data-v="c_swp">Longevity</button>
         </div>
-        
         <div id="c_analysis" class="view active">
             <div class="sub-toggle">
-                <label><input type="radio" name="viz" value="donut" checked><span>Composition</span></label> |
-                <label><input type="radio" name="viz" value="graph"><span>Timeline</span></label> |
-                <label><input type="radio" name="viz" value="table"><span>Yearly Table</span></label>
+                <label><input type="radio" name="viz" value="donut" checked><span>Composition</span></label>
+                <label><input type="radio" name="viz" value="graph"><span>Timeline</span></label>
+                <label><input type="radio" name="viz" value="table"><span>Table</span></label>
             </div>
             <div id="boxD" class="chart-wrap">
                 <canvas id="chtD"></canvas>
-                <div style="position:absolute; top:55%; left:50%; transform:translate(-50%,-50%); text-align:center; pointer-events:none">
-                    <span style="color:#8b949e; font-size:0.9vh">PROFIT</span><b id="rt" style="display:block; font-size:2vh">0</b>
+                <div style="position:absolute;top:55%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none">
+                    <span style="color:#8b949e;font-size:.7rem">NET PROFIT</span><b id="rt" style="display:block;font-size:1.2rem">0</b>
                 </div>
             </div>
             <div id="boxL" class="chart-wrap" style="display:none"><canvas id="chtL"></canvas></div>
-            <div id="boxT" class="scroll" style="display:none">
-                <table><thead><tr><th>Year</th><th>Capital</th><th>Growth</th><th>Total</th></tr></thead><tbody id="tb"></tbody></table>
-            </div>
+            <div id="boxT" class="scroll" style="display:none"><table><thead><tr><th>Year</th><th>Capital</th><th>Growth</th><th>Total</th></tr></thead><tbody id="tb"></tbody></table></div>
         </div>
-
         <div id="c_maturity" class="view"><div class="chart-wrap"><canvas id="chtB"></canvas></div></div>
-
         <div id="c_swp" class="view" style="text-align:center">
-            <div style="color:#8b949e">Withdrawal Sustainability:</div>
-            <div class="swp-res" id="swpLifeMain">Calculating...</div>
-            <div style="font-size:1.1vh; color:var(--s); margin-bottom:10px">Total Cash Withdrawn: <b id="totalSwpCash"></b></div>
-            <div style="font-size:0.9vh; color:#484f58; padding:0 20px">Based on <span id="swpRateDisp"></span>% annual growth on remaining balance.</div>
+            <div style="color:#8b949e;margin-top:20px">Longevity Score:</div>
+            <div class="swp-res" id="swpLifeMain">...</div>
+            <div style="font-size:1rem;color:var(--s);margin-bottom:10px">Total Cash Out: <b id="totalSwpCash"></b></div>
         </div>
-
         <div class="grid">
             <div class="stat"><label>Invested</label><span id="ri" style="color:var(--s)">0</span></div>
             <div class="stat"><label>Total Profit</label><span id="rgTotal" style="color:var(--p)">0</span></div>
             <div class="stat"><label>Tax Est.</label><span id="rx" style="color:#ff4d4d">0</span></div>
-            <div class="stat"><label>Final Maturity</label><span id="rs">0</span></div>
-            <div class="stat"><label>Monthly Income</label><span id="gridSwp" style="color:var(--p)">0</span></div>
+            <div class="stat"><label>Gross Maturity</label><span id="rs">0</span></div>
+            <div class="stat"><label>Annual Income</label><span id="gridSwp" style="color:var(--p)">0</span></div>
             <div class="stat"><label>Longevity</label><span id="swpStat">0</span></div>
         </div>
     </div>
-
-    <div class="disclaimer-bottom">
-        <b>EDUCATIONAL TOOL:</b> This model simulates growth and depletion. Market returns are never fixed.
-    </div>
-    <footer>Professional Mathematical Modeler • For Educational Use</footer>
+    <div class="disclaimer-bottom"><b>EDUCATIONAL TOOL:</b> Annualized projections based on steady returns. Market results vary.</div>
+    <footer>© 2026 PureCalc Modeler</footer>
 </div>
-
 <script>
-const _=id=>document.getElementById(id); let cD, cL, cB;
-
-const run=()=>{
-    const cur="₹", 
-          m=+_('i1').value, rPa=+_('i2').value, r=rPa/1200, yInv=+_('i3').value, yAcc=+_('iWait').value, 
-          tx=+_('i4').value/100, swpPerc=+_('iSwp').value/100;
-
-    const f=v=>cur+Math.round(v).toLocaleString('en-IN');
-    let h='', labs=[], dI=[], dV=[];
-    let currentWealth = 0, wealthAtEndOfPhase = 0;
-    const totalYears = yInv + yAcc;
-
-    for(let i=1; i<=totalYears; i++){
-        if(i <= yInv) {
-            let n = i * 12;
-            currentWealth = m * ((Math.pow(1+r,n)-1)/r) * (1+r);
-            dI.push(m * n);
-            if(i == yInv) wealthAtEndOfPhase = currentWealth;
-        } else {
-            currentWealth *= Math.pow(1+r, 12);
-            dI.push(m * yInv * 12);
-        }
-        h += `<tr><td>Yr ${i}</td><td>${f(dI[i-1])}</td><td>${f(currentWealth-dI[i-1])}</td><td>${f(currentWealth)}</td></tr>`;
-        labs.push('Y'+i); dV.push(Math.round(currentWealth));
-    }
-
-    const invT = m * yInv * 12, lastV = dV[totalYears-1] || 0;
-    const totalGain = lastV - invT, tax = totalGain * tx, netRedemption = lastV - tax;
-
-    // SWP Sustainability Logic
-    const swpMonthlyAmt = lastV * swpPerc;
-    let swpMonths = 0, tempCorpus = lastV, totalWithdrawn = 0;
-    
-    if(swpMonthlyAmt > (tempCorpus * r)) { 
-        while(tempCorpus > swpMonthlyAmt && swpMonths < 1200) {
-            tempCorpus = (tempCorpus * (1 + r)) - swpMonthlyAmt;
-            swpMonths++;
-            totalWithdrawn += swpMonthlyAmt;
-        }
-        let yrs = Math.floor(swpMonths/12), mos = swpMonths%12;
-        _('swpLifeMain').innerText = `${yrs} Years, ${mos} Months`;
-        _('swpStat').innerText = `${yrs}y ${mos}m`;
-        _('swpLifeMain').style.color = yrs > 25 ? "var(--p)" : "var(--t)";
-    } else {
-        _('swpLifeMain').innerHTML = `Infinity <span class="swp-small">Corpus grows forever</span>`;
-        _('swpStat').innerText = "Infinity";
-        _('swpLifeMain').style.color = "var(--p)";
-        totalWithdrawn = swpMonthlyAmt * 360; // 30 yr projection
-    }
-
-    _('totalSwpCash').innerText = f(totalWithdrawn);
-    _('gridSwp').innerText = f(swpMonthlyAmt);
-    _('swpVal').innerText = f(swpMonthlyAmt);
-    _('swpPercDisp').innerText = (swpPerc * 100).toFixed(1) + "%";
-    _('swpAmtDisp').innerText = f(swpMonthlyAmt);
-    _('swpRateDisp').innerText = rPa;
-
-    _('v1').innerText=f(m); _('v2').innerText=rPa+'%'; _('v3').innerText=yInv+'Y'; 
-    _('vWait').innerText=yAcc+'Y'; _('v4').innerText=_('i4').value+'%';
-    _('rt').innerText=f(netRedemption); _('ri').innerText=f(invT); 
-    _('rgTotal').innerText=f(totalGain); _('rx').innerText=f(tax); _('rs').innerText=f(lastV);
-    
-    let extraM = (tax > 0 && lastV > 0 && r > 0) ? Math.ceil(Math.log(1 + (tax / lastV)) / Math.log(1 + r)) : 0;
-    _('rtw').innerText = `${Math.floor(extraM/12)}y ${extraM%12}m`;
-    _('tb').innerHTML=h;
-
-    // Charts
-    if(cD)cD.destroy();
-    cD=new Chart(_('chtD'),{type:'doughnut',data:{datasets:[{data:[invT, totalGain-tax, tax],backgroundColor:['#3b82f6','#10b981','#f59e0b'],borderWidth:0}]},options:{cutout:'85%',maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-
-    if(cL)cL.destroy();
-    cL=new Chart(_('chtL'),{type:'line',data:{labels:labs,datasets:[{data:dV,borderColor:'#10b981',fill:true,backgroundColor:'rgba(16,185,129,0.1)',tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false}}}}});
-
-    if(cB)cB.destroy();
-    cB=new Chart(_('chtB'),{type:'bar',data:{labels:['Value'],datasets:[{label:'Inv',data:[invT],backgroundColor:'#3b82f6',stack:'s'},{label:'Gain',data:[totalGain-tax],backgroundColor:'#10b981',stack:'s'},{label:'Tax',data:[tax],backgroundColor:'#f59e0b',stack:'s'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{stacked:true,display:false},x:{stacked:true,grid:{display:false}}}}});
-};
-
-['i1','i2','i3','iWait','i4','iSwp'].forEach(x=>_(x).oninput=run);
-document.getElementsByName('viz').forEach(x=>x.onchange=(e)=>{
-    ['boxD','boxL','boxT'].forEach(b=>_(b).style.display='none');
-    const map = {donut:'boxD', graph:'boxL', table:'boxT'};
-    _(map[e.target.value]).style.display = 'block';
-});
-document.querySelectorAll('.tab').forEach(t=>{
-    t.onclick=()=>{
-        document.querySelectorAll('.tab,.view').forEach(el=>el.classList.remove('active'));
-        t.classList.add('active'); _(t.dataset.v).classList.add('active');
-    }
-});
-run();
+    const _=id=>document.getElementById(id);let cD,cL,cB;
+    const run=()=>{
+        const cur="₹",A=+_('i1').value,rPa=+_('i2').value,r=rPa/100,yI=+_('i3').value,yA=+_('iWait').value,tx=+_('i4').value/100,sP=+_('iSwp').value/100,f=v=>cur+Math.round(v).toLocaleString('en-IN');
+        let h='',labs=[],dV=[],curW=0;const totY=yI+yA;
+        for(let i=1;i<=totY;i++){curW=i<=yI?(curW+A)*(1+r):curW*(1+r);const inv=i<=yI?A*i:A*yI;h+=`<tr><td>Year ${i}</td><td>${f(inv)}</td><td>${f(curW-inv)}</td><td>${f(curW)}</td></tr>`;labs.push('Y'+i);dV.push(Math.round(curW))}
+        const invT=A*yI,gM=dV[totY-1]||0,totG=gM-invT,tX=totG>0?totG*tx:0,nM=gM-tX,sA=nM*sP;
+        let sY=0,tC=nM,tW=0;
+        if(sA>(tC*r)){while(tC>sA&&sY<100){tC=(tC-sA)*(1+r);sY++;tW+=sA}_('swpLifeMain').innerText=sY+' Years';_('swpStat').innerText=sY+'y';_('swpLifeMain').style.color=sY>25?'var(--p)':'var(--t)'}
+        else{_('swpLifeMain').innerHTML=`Infinity <span class="swp-small">(Grows Forever)</span>`;_('swpStat').innerText='Infinity';_('swpLifeMain').style.color='var(--p)';tW=sA*30}
+        _('v1').innerText=f(A);_('v2').innerText=rPa+'%';_('v3').innerText=yI+'Y';_('vWait').innerText=yA+'Y';_('v4').innerText=_('i4').value+'%';_('swpVal').innerText=f(sA);_('swpPercDisp').innerText=(sP*100).toFixed(1)+'%';_('ri').innerText=f(invT);_('rgTotal').innerText=f(totG);_('rx').innerText=f(tX);_('rs').innerText=f(gM);_('rt').innerText=f(nM);_('gridSwp').innerText=f(sA);_('totalSwpCash').innerText=f(tW);_('tb').innerHTML=h;
+        let exY=(tX>0&&gM>0&&r>0)?Math.ceil(Math.log(1+(tX/gM))/Math.log(1+r)):0;_('rtw').innerText=exY+' Years';
+        if(cD)cD.destroy();cD=new Chart(_('chtD'),{type:'doughnut',data:{datasets:[{data:[invT,totG-tX,tX],backgroundColor:['#3b82f6','#10b981','#f59e0b'],borderWidth:0}]},options:{cutout:'85%',maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+        if(cL)cL.destroy();cL=new Chart(_('chtL'),{type:'line',data:{labels:labs,datasets:[{data:dV,borderColor:'#10b981',fill:true,backgroundColor:'rgba(16,185,129,0.1)',tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false},ticks:{color:'#8b949e'}}}}});
+        if(cB)cB.destroy();cB=new Chart(_('chtB'),{type:'bar',data:{labels:['Breakdown'],datasets:[{label:'Inv',data:[invT],backgroundColor:'#3b82f6'},{label:'Gain',data:[totG-tX],backgroundColor:'#10b981'},{label:'Tax',data:[tX],backgroundColor:'#f59e0b'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{stacked:true,display:false},x:{stacked:true,grid:{display:false},ticks:{color:'#8b949e'}}}}});
+    };
+    ['i1','i2','i3','iWait','i4','iSwp'].forEach(id=>_(id).oninput=run);
+    document.getElementsByName('viz').forEach(r=>r.onchange=e=>{['boxD','boxL','boxT'].forEach(b=>_(b).style.display='none');_({donut:'boxD',graph:'boxL',table:'boxT'}[e.target.value]).style.display='block';if(cL)cL.resize();if(cD)cD.resize()});
+    document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab,.view').forEach(e=>e.classList.remove('active'));t.classList.add('active');_(t.dataset.v).classList.add('active');if(cB)cB.resize();if(cL)cL.resize()});
+    run();
 </script>
 </body>
 </html>
