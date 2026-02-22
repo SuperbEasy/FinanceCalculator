@@ -13,16 +13,19 @@ h1{text-align:center;font-size:3vh;color:#2e7d32}
 .input-group{margin:2vh 0}
 label{display:block;font-size:2vh;margin-bottom:1vh;color:#33691e}
 input[type=number]{width:100%;padding:1vh;font-size:2vh;border:none;background:#eee;border-radius:5px}
-.slider{width:100%;margin-top:1vh;-webkit-appearance:none;height:1vh;background:#ccc;border-radius:5px}
-.slider::-webkit-slider-thumb{-webkit-appearance:none;width:2vh;height:2vh;background:#4CAF50;clip-path:polygon(0 0,100% 50%,0 100%);cursor:pointer}
+.slider{width:100%;margin-top:1vh;-webkit-appearance:none;height:1vh;background:#4CAF50;border-radius:5px}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:2vh;height:2vh;background:#2e7d32;border-radius:50%;cursor:pointer}
 .radio-group{display:flex;gap:2vw}
 .tabs{display:flex;border-bottom:2px solid #c8e6c9;margin-bottom:2vh}
 .tab{flex:1;text-align:center;padding:1vh;cursor:pointer;font-size:2vh;background:#f1f8e9;color:#2e7d32}
 .tab.active{background:#c5e1a5;font-weight:bold}
 .tab-content{display:none}
 .tab-content.active{display:block}
-#results{margin-top:2vh;font-size:2vh;background:#f9fbe7;padding:2vh;border-radius:8px;border:1px solid #cddc39}
-canvas{width:100%;max-height:40vh;background:rgba(255,255,255,0.8);border-radius:8px;padding:1vh}
+#results{margin-top:2vh;font-size:2vh;background:#f9fbe7;padding:2vh;border-radius:8px;border:1px solid #cddc39;display:grid;grid-template-columns:1fr 1fr;gap:1vh}
+#results p{margin:0}
+#results b{text-align:right;display:block}
+#results span{text-align:left;display:block}
+canvas{width:60%;max-height:30vh;margin:auto;background:rgba(255,255,255,0.8);border-radius:8px;padding:1vh}
 table{width:100%;border-collapse:collapse;margin-top:2vh;background:rgba(255,255,255,0.9)}
 th,td{border:1px solid #c8e6c9;padding:1vh;text-align:center;font-size:1.8vh}
 th{background:#c5e1a5;color:#1b5e20}
@@ -60,10 +63,10 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelect
 let chart;
 function calc(){
 let c=document.querySelector('input[name=currency]:checked').value,m=+$('monthlyAmount').value,r=+$('returnRate').value/100,d=+$('duration').value,t=+$('taxRate').value/100,n=d*12,i=m*n,u=m*(((Math.pow(1+r/12,n)-1)/(r/12))*(1+r/12)),ret=u-i,tax=ret*t,tot=u-tax;
-$('results').innerHTML=`<p><b>Invested:</b> ${c}${i.toFixed(2)}</p><p><b>Returns:</b> ${c}${ret.toFixed(2)}</p><p><b>Tax:</b> ${c}${tax.toFixed(2)}</p><p><b>Total:</b> ${c}${tot.toFixed(2)}</p>`;
+$('results').innerHTML=`<p><b>Invested:</b><span>${c}  ${i.toFixed(0)}</span></p><p><b>Returns:</b><span>${c}  ${ret.toFixed(0)}</span></p><p><b>Tax:</b><span>${c}  ${tax.toFixed(0)}</span></p><p><b>Total:</b><span>${c}  ${tot.toFixed(0)}</span></p>`;
 if(chart)chart.destroy();
-chart=new Chart($('pieChart'),{type:'doughnut',data:{labels:['Invested','Returns','Tax'],datasets:[{data:[i,ret,tax],backgroundColor:['#2196F3','#4CAF50','#FFB74D']}]},options:{plugins:{datalabels:{formatter:(v,ctx)=>((v/ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b))*100).toFixed(1)+'%',color:'#000'}}}});
-let tbl='<tr><th>Year</th><th>Invested</th><th>Value</th></tr>';for(let y=1;y<=d;y++){let v=m*(((Math.pow(1+r/12,y*12)-1)/(r/12))*(1+r/12));tbl+=`<tr><td>${y}</td><td>${c}${(m*y*12).toFixed(2)}</td><td>${c}${v.toFixed(2)}</td></tr>`}$('growthTable').innerHTML=tbl}
+chart=new Chart($('pieChart'),{type:'doughnut',data:{labels:['Invested','Returns','Tax'],datasets:[{data:[i,ret,tax],backgroundColor:['#2196F3','#4CAF50','#FFB74D']}]},options:{plugins:{datalabels:{formatter:(v,ctx)=>((v/ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b))*100).toFixed(0)+'%',color:'#000',font:{weight:'bold'}}}}});
+let tbl='<tr><th>Year</th><th>Invested</th><th>Value</th></tr>';for(let y=1;y<=d;y++){let v=m*(((Math.pow(1+r/12,y*12)-1)/(r/12))*(1+r/12));tbl+=`<tr><td>${y}</td><td>${c}  ${(m*y*12).toFixed(0)}</td><td>${c}  ${v.toFixed(0)}</td></tr>`}$('growthTable').innerHTML=tbl}
 calc();
 </script>
 </body>
