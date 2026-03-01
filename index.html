@@ -1,175 +1,372 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>PureCalc Pro | Wealth & SWP Expert</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WealthGenius Pro | Financial Intelligence</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root{--p:#10b981;--s:#3b82f6;--t:#f59e0b;--v:#a855f7;--bg:#0a0c10;--c:#161b22;--border:#30363d;--text:#e6edf3}
-        .light-mode{--bg:#f0f2f5;--c:#ffffff;--border:#d1d9e0;--text:#1a1a1a}
-        *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-        body{margin:0;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;align-items:center;padding:15px;font-size:13px;transition:0.3s}
-        .app{width:100%;max-width:1100px;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:15px}
-        header{grid-column:1/-1;text-align:center;margin-bottom:10px}
-        h1{margin:0;font-size:2.2rem;color:var(--text);letter-spacing:-1px}
-        .panel{background:var(--c);padding:20px;border-radius:20px;border:1px solid var(--border);display:flex;flex-direction:column;min-height:650px;overflow:hidden}
-        .label{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:#8b949e}
-        .label b{color:var(--s);font-size:0.95rem}
-        input[type=range]{width:100%;accent-color:var(--p);margin:6px 0;cursor:pointer}
-        .swp-box{background:rgba(0,0,0,0.2);border:1px solid var(--border);color:var(--p);padding:4px 10px;border-radius:6px;font-weight:bold}
-        .tabs{display:flex;background:rgba(0,0,0,0.2);padding:3px;border-radius:10px;margin-bottom:12px}
-        .tab{flex:1;padding:8px;border:none;background:none;color:#8b949e;cursor:pointer;font-size:.75rem;font-weight:600}
-        .tab.active{background:var(--border);color:var(--text);border-radius:8px}
-        .view{display:none;height:300px;width:100%;margin-bottom:15px;position:relative}
-        .view.active{display:flex;flex-direction:column}
-        .chart-wrap{width:100%;height:100%;position:relative;padding:5px}
-        .scroll{overflow-y:auto;width:100%;height:100%;border:1px solid var(--border);border-radius:10px;background:rgba(0,0,0,0.1)}
-        table{width:100%;border-collapse:collapse;font-size:.75rem}
-        th{position:sticky;top:0;background:var(--border);padding:8px;text-align:left;color:var(--p);z-index:2}
-        td{padding:8px;border-bottom:1px solid var(--border)}
-        
-        /* Stats Table Style */
-        .stats-table{width:100%;margin-top:auto;border:1px solid var(--border);border-radius:10px;overflow:hidden}
-        .stats-table td{padding:6px 10px;background:rgba(255,255,255,0.02)}
-        .stats-table .val{text-align:right;font-weight:700}
-        .stats-table .head{color:#8b949e;font-size:0.7rem;text-transform:uppercase}
-
-        .swp-res{font-size:1.8rem;font-weight:800;margin:2px 0}
-        .note-orange{font-size:.7rem;color:var(--t);display:block;line-height:1.2}
-        .stress-btn{background:var(--t);color:#000;border:none;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;margin-top:5px}
-        .info-link{color:var(--p);text-decoration:none;font-weight:bold;border:1px solid var(--p);padding:8px 16px;border-radius:30px;display:inline-block;margin:15px 0}
-        hr{border:0;border-top:1px solid var(--border);margin:10px 0}
+        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.3s ease; }
+        .dark body { background-color: #000000; color: #ffffff; }
+        .dark .glass { background: #0a0a0a; border: 1px solid #1a1a1a; }
+        .glass { background: #ffffff; border: 1px solid #f1f5f9; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        .input-mini { width: 110px; height: 30px; font-size: 0.9rem; text-align: right; border-radius: 6px; border: 1px solid #e2e8f0; background: #f8fafc; font-weight: 700; padding-right: 8px; outline: none; color: #3b82f6; }
+        .dark .input-mini { background: #111; border-color: #333; color: #3b82f6; }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; cursor: pointer; margin-top: 8px; }
+        input[type=range]::-webkit-slider-runnable-track { height: 3px; background: #333; border-radius: 2px; }
+        input[type=range]::-webkit-slider-thumb { height: 16px; width: 16px; border-radius: 50%; background: #3b82f6; -webkit-appearance: none; margin-top: -6px; border: 2px solid #fff; }
+        .tab-active { color: #3b82f6; border-bottom: 3px solid #3b82f6; font-weight: 800; }
+        .custom-table { width: 100%; border-collapse: collapse; }
+        .custom-table th { padding: 12px; font-size: 11px; text-transform: uppercase; color: #64748b; border-bottom: 1px solid #1e293b; text-align: left; }
+        .custom-table td { padding: 14px 12px; font-size: 13px; border-bottom: 1px solid #1e293b; }
+        .val-col { text-align: right; font-weight: 700; font-family: monospace; min-width: 160px; }
+        .defer-row { background: rgba(245, 158, 11, 0.08); }
+        .dark .defer-row { background: rgba(245, 158, 11, 0.12); }
+        .defer-text { color: #f59e0b !important; }
+        .stat-card { padding: 8px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.05); background: rgba(0,0,0,0.02); }
+        .dark .stat-card { border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); }
+        .legacy-box { background: #0f172a !important; border: 1px solid #1e293b !important; }
     </style>
 </head>
-<body>
-<div class="app">
-    <header><h1>PureCalc Pro</h1><div style="color:var(--p);font-weight:600">Advanced Wealth Modeler</div></header>
-    
-    <div class="panel">
-        <div class="label">Annual Investment <b id="v1"></b></div><input type="range" id="i1" min="10000" max="2000000" step="10000" value="120000">
-        <div class="label">Expected Growth (%) <b id="v2"></b></div><input type="range" id="i2" min="1" max="25" step="0.5" value="12">
-        <div class="label">Investment Phase (Years) <b id="v3"></b></div><input type="range" id="i3" min="1" max="40" value="10">
-        <div class="label">Accumulation Phase <b id="vWait"></b></div><input type="range" id="iWait" min="0" max="30" value="5">
-        <hr>
-        <div class="label">SWP (Yearly) <span id="swpVal" class="swp-box">0</span></div>
-        <div class="label" style="opacity:.7">Withdrawal Rate: <b id="swpPercDisp">3%</b></div>
-        <input type="range" id="iSwp" min="1" max="12" step="0.5" value="3">
-        <div class="label">Expected Inflation (%) <b id="vInfl"></b></div><input type="range" id="iInfl" min="0" max="12" step="0.5" value="5">
-        <hr>
-        <div class="label" style="opacity:.6">Tax Rate (LTCG %) <b id="v4"></b></div><input type="range" id="i4" min="0" max="30" step="0.5" value="12.5">
-        <span class="note-orange" style="text-align:right">Tax Offset: <b id="rtw">0 Years</b></span>
-        
-        <table class="stats-table">
-            <tr><td class="head">Invested</td><td class="val" id="ri" style="color:var(--s)">0</td></tr>
-            <tr><td class="head">SIP Profit</td><td class="val" id="rgSIP" style="color:var(--s)">0</td></tr>
-            <tr><td class="head">Accumulation Gain</td><td class="val" id="rgAcc" style="color:var(--v)">0</td></tr>
-            <tr><td class="head">Total Profit</td><td class="val" id="rgTotal" style="color:var(--p)">0</td></tr>
-            <tr><td class="head">Tax Est.</td><td class="val" id="rx" style="color:#ff4d4d">0</td></tr>
-            <tr><td class="head">First SWP</td><td class="val" id="gridSwp" style="color:var(--p)">0</td></tr>
-        </table>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <header class="flex justify-between items-center mb-8 no-pdf">
+            <div>
+                <h1 class="text-2xl font-extrabold dark:text-white">WealthGenius <span class="text-blue-500">Live</span></h1>
+                <p class="text-[10px] font-black text-red-500 uppercase italic tracking-widest">Education Purpose Only</p>
+            </div>
+            <button onclick="toggleDarkMode()" class="p-2 rounded-xl glass text-xs font-bold">🌓 Toggle Theme</button>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <aside class="lg:col-span-4 space-y-4 no-pdf">
+                <div class="glass p-5 rounded-3xl space-y-5 sticky top-8">
+                    <h2 class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Accumulation Phase</h2>
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-center"><label class="text-xs font-bold text-slate-500 uppercase">Current Age</label><input type="number" id="age" value="30" oninput="calculate()" class="input-mini"></div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-center"><label class="text-xs font-bold text-slate-500 uppercase">Monthly SIP (₹)</label><input type="number" id="sip_input" value="50000" oninput="calculate()" class="input-mini"></div>
+                        <input type="range" id="sip_range" min="1000" max="1000000" step="5000" value="50000">
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-center"><label class="text-xs font-bold text-slate-500 uppercase">Tenure (Yrs)</label><input type="number" id="tenure" value="15" oninput="calculate()" class="input-mini"></div>
+                        <input type="range" id="tenure_range" min="1" max="50" value="15">
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-center"><label class="text-xs font-bold text-slate-500 uppercase">Deferment (Yrs)</label><input type="number" id="deferment" value="5" oninput="calculate()" class="input-mini"></div>
+                        <input type="range" id="defer_range" min="0" max="30" value="5">
+                    </div>
+                    <div class="space-y-1 pb-4 border-b border-zinc-800">
+                        <div class="flex justify-between items-center"><label class="text-xs font-bold text-slate-500 uppercase">Returns (%)</label><input type="number" id="rate_input" value="12" oninput="calculate()" class="input-mini"></div>
+                        <input type="range" id="rate_range" min="1" max="30" step="0.5" value="12">
+                    </div>
+
+                    <div class="py-2 space-y-3">
+                        <h2 class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Master Strategy Snapshot</h2>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="stat-card">
+                                <p class="text-[8px] uppercase text-slate-500 font-bold">Total Invested</p>
+                                <p id="snap-invested" class="text-xs font-black text-blue-500">₹0</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="text-[8px] uppercase text-slate-500 font-bold">SIP Corpus</p>
+                                <p id="snap-sip-corpus" class="text-xs font-black text-cyan-500">₹0</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="text-[8px] uppercase text-slate-500 font-bold">Defer Growth</p>
+                                <p id="snap-defer-gain" class="text-xs font-black text-[#f59e0b]">₹0</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="text-[8px] uppercase text-slate-500 font-bold">Final Corpus</p>
+                                <p id="snap-final-corpus" class="text-xs font-black text-emerald-500">₹0</p>
+                            </div>
+                            <div class="legacy-box col-span-2 p-3 rounded-xl flex justify-between items-center shadow-inner">
+                                <div>
+                                    <p class="text-[8px] uppercase text-slate-400 font-bold">Total SWP Payout</p>
+                                    <p id="snap-total-payout" class="text-xs font-black text-emerald-400">₹0</p>
+                                </div>
+                                <div class="text-right border-l border-slate-700 pl-4">
+                                    <p class="text-[8px] uppercase text-slate-400 font-bold">Final Legacy</p>
+                                    <p id="snap-legacy" class="text-xs font-black text-white">₹0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 class="text-[10px] font-black text-emerald-500 uppercase tracking-widest pt-4 border-t border-zinc-800">Distribution Phase</h2>
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-center"><label class="text-xs font-bold text-slate-500 uppercase">Withdrawal (₹)</label><input type="number" id="swp_value" value="150000" oninput="syncSWP('amount')" class="input-mini"></div>
+                        <input type="range" id="swp_range" min="1000" max="2000000" step="5000" value="150000" oninput="syncSWP('amount')">
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-center"><label class="text-xs font-bold text-slate-500 uppercase">Corpus (%)</label><input type="number" id="swp_percent" value="4" step="0.1" oninput="syncSWP('percent')" class="input-mini"></div>
+                        <input type="range" id="swp_percent_range" min="0.1" max="20" step="0.1" value="4" oninput="syncSWP('percent')">
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-center"><label class="text-xs font-bold text-slate-500 uppercase">SWP Years</label><input type="number" id="swp_years" value="25" oninput="calculate()" class="input-mini"></div>
+                        <input type="range" id="swp_years_range" min="1" max="50" value="25">
+                    </div>
+                </div>
+            </aside>
+
+            <main class="lg:col-span-8 space-y-6">
+                <div class="flex gap-8 no-pdf border-b border-zinc-900 overflow-x-auto whitespace-nowrap mb-4">
+                    <button onclick="showTab('tab1')" id="t-tab1" class="pb-3 text-[11px] tab-active uppercase tracking-widest">SIP Growth</button>
+                    <button onclick="showTab('tab2')" id="t-tab2" class="pb-3 text-[11px] tab-inactive uppercase tracking-widest">SWP Journey</button>
+                    <button onclick="showTab('tab3')" id="t-tab3" class="pb-3 text-[11px] tab-inactive uppercase tracking-widest">Full Report</button>
+                </div>
+
+                <div id="tab1" class="tab-content space-y-6">
+                    <div class="glass p-6 rounded-3xl h-80"><canvas id="sipChart1"></canvas></div>
+                    <div class="glass p-6 rounded-3xl overflow-x-auto">
+                        <table class="custom-table">
+                            <thead><tr><th>Age (Year)</th><th>Total Investment</th><th class="text-right">Estimated Wealth</th></tr></thead>
+                            <tbody id="sip-table-mini"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="tab2" class="tab-content hidden space-y-6">
+                    <div class="glass p-6 rounded-3xl h-80"><canvas id="swpChart2"></canvas></div>
+                    <div class="glass p-6 rounded-3xl overflow-x-auto">
+                        <table class="custom-table">
+                            <thead><tr><th>Age (Year)</th><th>Monthly Payout</th><th class="text-right">Balance Corpus</th></tr></thead>
+                            <tbody id="swp-table-mini"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="tab3" class="tab-content hidden space-y-12 bg-white dark:bg-black p-6 md:p-10 rounded-[2.5rem]">
+                    <div class="border-b-4 border-blue-600 pb-4 flex justify-between items-end">
+                        <div>
+                            <h2 class="text-3xl font-black text-blue-600 uppercase">Wealth Report</h2>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs font-black text-red-500 uppercase italic">Education Purpose Only</p>
+                        </div>
+                    </div>
+
+                    <section class="grid grid-cols-2 md:grid-cols-4 gap-6 bg-slate-50 dark:bg-zinc-900/50 p-6 rounded-2xl">
+                        <div><p class="text-[9px] text-slate-500 uppercase font-black">Monthly SIP</p><p id="rep-sip" class="text-lg font-bold text-blue-500">₹0</p></div>
+                        <div><p class="text-[9px] text-slate-500 uppercase font-black">Tenure</p><p id="rep-tenure" class="text-lg font-bold dark:text-white">0 Yrs</p></div>
+                        <div><p class="text-[9px] text-slate-500 uppercase font-black">Deferment</p><p id="rep-defer" class="text-lg font-bold dark:text-white">0 Yrs</p></div>
+                        <div><p class="text-[9px] text-slate-500 uppercase font-black">Expected Returns</p><p id="rep-rate" class="text-lg font-bold text-emerald-500">0%</p></div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xs font-black text-blue-500 mb-6 uppercase tracking-widest">Growth Phase Analysis</h3>
+                        <div class="h-80 mb-8"><canvas id="sipChart3"></canvas></div>
+                        <div class="glass p-6 rounded-3xl overflow-x-auto">
+                            <table class="custom-table">
+                                <thead><tr><th>Age (Year)</th><th>Investment</th><th class="text-right">Wealth</th></tr></thead>
+                                <tbody id="sip-table-full"></tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xs font-black text-emerald-500 mb-6 uppercase tracking-widest">Withdrawal Phase Analysis</h3>
+                        <div class="h-80 mb-8"><canvas id="swpChart3"></canvas></div>
+                        <div class="glass p-6 rounded-3xl overflow-x-auto">
+                            <table class="custom-table">
+                                <thead><tr><th>Age (Year)</th><th>Monthly Payout</th><th class="text-right">Balance Corpus</th></tr></thead>
+                                <tbody id="swp-table-full"></tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xs font-black text-orange-500 mb-6 uppercase tracking-widest">Lifecycle Projection</h3>
+                        <div class="h-96"><canvas id="combinedChart"></canvas></div>
+                    </section>
+
+                    <div class="p-6 bg-slate-900 rounded-2xl border border-slate-800">
+                        <h4 class="text-[10px] font-black uppercase mb-2 text-slate-400">Legal Disclaimer</h4>
+                        <p class="text-[10px] text-slate-300 leading-relaxed">
+                            This report is generated for educational and illustrative purposes only. Mutual fund investments are subject to market risks. Always consult a certified financial advisor before making decisions.
+                        </p>
+                    </div>
+
+                    <footer class="no-pdf pt-10 border-t border-zinc-800">
+                        <button onclick="generatePDF()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl hover:bg-blue-700 shadow-xl transition-all">GENERATE OFFICIAL PDF</button>
+                    </footer>
+                </div>
+            </main>
+        </div>
     </div>
 
-    <div class="panel">
-        <div class="tabs">
-            <button class="tab active" data-v="c_analysis">Accumulation</button>
-            <button class="tab" data-v="c_swp">SWP Longevity</button>
-            <button class="tab" data-v="c_stress">Stress Test</button>
-        </div>
+    <script>
+        let charts = {};
+        let finalCorpus = 0;
+        const currentYear = new Date().getFullYear();
 
-        <div id="c_analysis" class="view active">
-            <div class="chart-wrap" style="height:180px"><canvas id="chtL"></canvas></div>
-            <div class="scroll" style="margin-top:10px">
-                <table><thead><tr><th>Year</th><th>Capital</th><th>Growth</th><th>Total</th></tr></thead><tbody id="tbAcc"></tbody></table>
-            </div>
-        </div>
+        function setupSync(id, inputId) {
+            const r = document.getElementById(id), i = document.getElementById(inputId);
+            if(!r || !i) return;
+            r.addEventListener('input', () => { i.value = r.value; calculate(); });
+            i.addEventListener('input', () => { r.value = i.value; calculate(); });
+        }
+        setupSync('sip_range', 'sip_input');
+        setupSync('tenure_range', 'tenure');
+        setupSync('defer_range', 'deferment');
+        setupSync('rate_range', 'rate_input');
+        setupSync('swp_years_range', 'swp_years');
 
-        <div id="c_swp" class="view" style="text-align:center">
-            <div class="swp-res" id="swpLifeMain" style="color:var(--p)">...</div>
-            <span id="infNote" class="note-orange" style="display:none;margin-bottom:5px">Grows forever under current parameters.</span>
-            <div class="chart-wrap" style="height:140px"><canvas id="chtS"></canvas></div>
-            <div class="scroll" style="margin-top:10px">
-                <table><thead><tr><th>Year</th><th>Withdrawal</th><th>Balance</th></tr></thead><tbody id="tbSwp"></tbody></table>
-            </div>
-        </div>
+        function syncSWP(type) {
+            const amtIn = document.getElementById('swp_value'), amtRa = document.getElementById('swp_range');
+            const pctIn = document.getElementById('swp_percent'), pctRa = document.getElementById('swp_percent_range');
+            if (type === 'amount') {
+                const val = event.target.value;
+                amtIn.value = val; amtRa.value = val;
+                if(finalCorpus > 0) {
+                    const p = ((val * 12) / finalCorpus) * 100;
+                    pctIn.value = p.toFixed(2); pctRa.value = p.toFixed(2);
+                }
+            } else {
+                const p = event.target.value;
+                pctIn.value = p; pctRa.value = p;
+                if(finalCorpus > 0) {
+                    const v = (finalCorpus * (p / 100)) / 12;
+                    amtIn.value = Math.round(v); amtRa.value = Math.round(v);
+                }
+            }
+            calculate();
+        }
 
-        <div id="c_stress" class="view" style="text-align:center">
-            <div style="color:var(--t);font-weight:700">🚨 20% Early Retirement Crash</div>
-            <div class="swp-res" id="stressLife" style="color:var(--t)">- -</div>
-            <div id="stressNote" style="font-size:0.8rem;margin-bottom:10px">Survival if market crashes in Year 1 of SWP.</div>
-            <div class="chart-wrap" style="height:140px"><canvas id="chtC"></canvas></div>
-            <button class="stress-btn" onclick="run()">Recalculate Stress</button>
-        </div>
+        function calculate() {
+            const age = parseInt(document.getElementById('age').value) || 30;
+            const sip = parseFloat(document.getElementById('sip_input').value) || 0;
+            const tenure = parseInt(document.getElementById('tenure').value) || 0;
+            const defer = parseInt(document.getElementById('deferment').value) || 0;
+            const rate = (parseFloat(document.getElementById('rate_input').value) || 0) / 100;
+            const swpYears = parseInt(document.getElementById('swp_years').value) || 0;
+            const monthlyW = parseFloat(document.getElementById('swp_value').value) || 0;
+            const mRate = rate / 12;
 
-        <div style="margin-top:auto; padding:10px; background:rgba(0,0,0,0.2); border-radius:10px; text-align:center">
-            <span style="color:#8b949e;font-size:.7rem">NET WEALTH (AFTER TAX)</span>
-            <div id="rt" style="font-size:1.5rem;font-weight:800;color:var(--p)">0</div>
-        </div>
-    </div>
-</div>
+            let corpus = 0, invested = 0, sipData = [], corpusAfterSip = 0;
+            for (let i = 1; i <= (tenure + defer); i++) {
+                let isDefer = i > tenure;
+                if (!isDefer) {
+                    for (let m = 0; m < 12; m++) {
+                        corpus = (corpus + sip) * (1 + mRate);
+                        invested += sip;
+                    }
+                    corpusAfterSip = corpus;
+                } else {
+                    corpus = corpus * (1 + rate);
+                }
+                sipData.push({ age: `${age + i} (${currentYear + i})`, bal: corpus, inv: invested, isDefer: isDefer });
+            }
+            finalCorpus = corpus;
 
-<div style="text-align:center">
-    <a href="information.html" class="info-link">🚀 Master Your Money: Rahul's Story</a><br>
-    <button class="theme-btn" onclick="document.body.classList.toggle('light-mode')" style="background:none;border:1px solid var(--border);color:var(--text);padding:8px 15px;border-radius:20px;cursor:pointer">🌓 Dark/Light</button>
-</div>
+            let currentBal = corpus, swpData = [], totalPayout = 0;
+            for (let i = 1; i <= swpYears; i++) {
+                let actualOut = 0;
+                for(let m=0; m<12; m++) {
+                    if(currentBal >= monthlyW) {
+                        currentBal = (currentBal - monthlyW) * (1 + mRate);
+                        actualOut += monthlyW;
+                        totalPayout += monthlyW;
+                    } else {
+                        totalPayout += currentBal;
+                        actualOut += currentBal;
+                        currentBal = 0;
+                    }
+                }
+                swpData.push({ age: `${age + tenure + defer + i} (${currentYear + tenure + defer + i})`, bal: currentBal, payout: actualOut / 12 });
+                if(currentBal <= 0) break;
+            }
 
-<script>
-    const _=id=>document.getElementById(id); let cL, cS, cC;
-    const run=()=>{
-        const cur="₹", A=+_('i1').value, rPa=+_('i2').value, r=rPa/100, yI=+_('i3').value, yA=+_('iWait').value, tx=+_('i4').value/100, sP=+_('iSwp').value/100, infl=+_('iInfl').value/100, f=v=>cur+Math.round(v).toLocaleString('en-IN');
-        
-        // 1. Accumulation Phase
-        let hAcc='', labsAcc=[], dV1=[], dV2=[], curW=0, sipG=0, accG=0;
-        for(let i=1; i<=(yI+yA); i++){
-            let prevW = curW;
-            curW = i<=yI ? (curW+A)*(1+r) : curW*(1+r);
-            if(i<=yI) sipG += (curW - prevW - A); else accG += (curW - prevW);
+            const fmt = v => '₹' + Math.round(v).toLocaleString('en-IN');
+            const fmtCr = v => '₹' + (v / 10000000).toFixed(2) + ' Cr';
             
-            hAcc += `<tr><td>Year ${i}</td><td>${f(i<=yI?A*i:A*yI)}</td><td>${f(curW-(i<=yI?A*i:A*yI))}</td><td>${f(curW)}</td></tr>`;
-            labsAcc.push('Y'+i);
-            if(i<=yI){ dV1.push(Math.round(curW)); dV2.push(null); }
-            else{ dV2.push(Math.round(curW)); if(i===yI+1) dV2[i-2]=dV1[i-2]; }
+            document.getElementById('rep-sip').innerText = fmt(sip);
+            document.getElementById('rep-tenure').innerText = tenure + ' Yrs';
+            document.getElementById('rep-defer').innerText = defer + ' Yrs';
+            document.getElementById('rep-rate').innerText = (rate*100).toFixed(1) + '%';
+
+            document.getElementById('snap-invested').innerText = fmt(invested);
+            document.getElementById('snap-sip-corpus').innerText = fmtCr(corpusAfterSip);
+            document.getElementById('snap-defer-gain').innerText = fmtCr(finalCorpus - corpusAfterSip);
+            document.getElementById('snap-final-corpus').innerText = fmtCr(finalCorpus);
+            document.getElementById('snap-total-payout').innerText = fmtCr(totalPayout);
+            document.getElementById('snap-legacy').innerText = fmtCr(currentBal);
+
+            const sRows = sipData.map(d => `
+                <tr class="${d.isDefer ? 'defer-row' : ''}">
+                    <td class="${d.isDefer ? 'defer-text font-bold' : ''}">${d.age}${d.isDefer ? ' <span class="text-[9px] uppercase">(Defer)</span>' : ''}</td>
+                    <td>${fmt(d.inv)}</td>
+                    <td class="val-col ${d.isDefer ? 'defer-text' : 'text-blue-500'}">${fmt(d.bal)}</td>
+                </tr>`).join('');
+            const wRows = swpData.map(d => `<tr><td>${d.age}</td><td>${fmt(d.payout)}</td><td class="val-col text-emerald-500">${fmt(d.bal)}</td></tr>`).join('');
+
+            document.getElementById('sip-table-mini').innerHTML = sRows;
+            document.getElementById('sip-table-full').innerHTML = sRows;
+            document.getElementById('swp-table-mini').innerHTML = wRows;
+            document.getElementById('swp-table-full').innerHTML = wRows;
+
+            renderCharts(sipData, swpData, tenure);
         }
-        
-        const invT=A*yI, gM=curW, totG=gM-invT, tX=totG>0?totG*tx:0, nM=gM-tX, sA_start=nM*sP;
 
-        // 2. SWP Phase (Normal)
-        let hSwp='', labsSwp=[], dVS=[], sY=0, tC=nM, currSA=sA_start;
-        while(tC>=currSA && sY<50){
-            tC = (tC - currSA) * (1+r);
-            sY++;
-            hSwp += `<tr><td>Year ${sY}</td><td>${f(currSA)}</td><td>${f(tC)}</td></tr>`;
-            labsSwp.push('Y'+sY); dVS.push(Math.round(tC));
-            currSA *= (1+infl);
+        function renderCharts(sipData, swpData, tenure) {
+            const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { color: '#888' } } },
+                scales: { y: { ticks: { color: '#666', callback: v => '₹'+(v/10000000).toFixed(1)+'Cr' }, grid: { color: '#222' } }, x: { ticks: { color: '#666' }, grid: { display: false } } } };
+
+            const up = (id, type, labels, datasets) => {
+                if(charts[id]) charts[id].destroy();
+                const ctx = document.getElementById(id);
+                if(ctx) charts[id] = new Chart(ctx, { type, data: { labels, datasets }, options: opt });
+            };
+
+            const sipLabels = sipData.map(d=>d.age);
+            const sipGrowth = sipData.map((d, i) => i < tenure ? d.bal : null);
+            const deferGrowth = sipData.map((d, i) => i >= tenure - 1 ? d.bal : null);
+
+            up('sipChart1', 'line', sipLabels, [
+                { label: 'SIP Phase', data: sipGrowth, borderColor: '#3b82f6', fill: true, backgroundColor: '#3b82f611', tension: 0.3 },
+                { label: 'Deferment Phase', data: deferGrowth, borderColor: '#f59e0b', fill: true, backgroundColor: '#f59e0b11', tension: 0.3 }
+            ]);
+
+            up('swpChart2', 'bar', swpData.map(d=>d.age), [{ label: 'Remaining', data: swpData.map(d=>d.bal), backgroundColor: '#10b981' }]);
+            up('sipChart3', 'line', sipLabels, [{ label: 'SIP Phase', data: sipGrowth, borderColor: '#3b82f6' }, { label: 'Deferment Phase', data: deferGrowth, borderColor: '#f59e0b' }]);
+            up('swpChart3', 'bar', swpData.map(d=>d.age), [{ label: 'Corpus', data: swpData.map(d=>d.bal), backgroundColor: '#10b981' }]);
+
+            const combinedLabels = [...sipLabels, ...swpData.map(d=>d.age)];
+            const combSip = [...sipGrowth, ...swpData.map(()=>null)];
+            const combDef = [...deferGrowth, ...swpData.map(()=>null)];
+            const combSwp = [...sipData.map(()=>null), ...swpData.map(d=>d.bal)];
+            if(swpData.length > 0) combSwp[sipData.length - 1] = sipData[sipData.length-1].bal;
+
+            up('combinedChart', 'line', combinedLabels, [
+                { label: 'SIP Phase', data: combSip, borderColor: '#3b82f6', tension: 0.3 },
+                { label: 'Deferment', data: combDef, borderColor: '#f59e0b', tension: 0.3 },
+                { label: 'SWP Phase', data: combSwp, borderColor: '#10b981', tension: 0.3 }
+            ]);
         }
 
-        // 3. Stress Phase (-20% Crash)
-        let stY=0, stC=nM*0.8, stSA=sA_start, dVC=[], labsC=[];
-        while(stC>=stSA && stY<50){
-            stC = (stC - stSA) * (1+r);
-            stY++;
-            stSA *= (1+infl);
-            dVC.push(Math.round(stC)); labsC.push('Y'+stY);
+        function showTab(id) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.querySelectorAll('button[id^="t-"]').forEach(b => { b.classList.remove('tab-active'); b.classList.add('tab-inactive'); });
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById('t-'+id).classList.replace('tab-inactive', 'tab-active');
+            calculate();
         }
 
-        // Update UI
-        _('v1').innerText=f(A); _('v2').innerText=rPa+'%'; _('v3').innerText=yI+'Y'; _('vWait').innerText=yA+'Y'; _('v4').innerText=_('i4').value+'%'; _('vInfl').innerText=(infl*100).toFixed(1)+'%';
-        _('ri').innerText=f(invT); _('rgSIP').innerText=f(sipG); _('rgAcc').innerText=f(accG); _('rgTotal').innerText=f(totG); _('rx').innerText=f(tX); _('rt').innerText=f(nM); _('gridSwp').innerText=f(sA_start);
-        _('swpVal').innerText=f(sA_start); _('swpPercDisp').innerText=(sP*100).toFixed(1)+'%';
-        _('swpLifeMain').innerText=sY >= 50 ? 'Infinity' : sY+' Years';
-        _('infNote').style.display=sY>=50?'block':'none';
-        _('stressLife').innerText=stY+' Years';
-        _('tbAcc').innerHTML=hAcc; _('tbSwp').innerHTML=hSwp;
-        _('rtw').innerText=((tX>0&&gM>0&&r>0)?Math.ceil(Math.log(1+(tX/gM))/Math.log(1+r)):0)+' Years';
+        async function generatePDF() {
+            const element = document.getElementById('tab3');
+            const canvas = await html2canvas(element, { scale: 2 });
+            const pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
+            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 210, (canvas.height * 210) / canvas.width);
+            pdf.save('WealthGenius_Full_Report.pdf');
+        }
 
-        // Charts
-        if(cL)cL.destroy(); cL=new Chart(_('chtL'),{type:'line',data:{labels:labsAcc,datasets:[{label:'SIP',data:dV1,borderColor:'#3b82f6',fill:true,backgroundColor:'rgba(59,130,246,0.1)',tension:0.3,spanGaps:true},{label:'Acc',data:dV2,borderColor:'#a855f7',fill:true,backgroundColor:'rgba(168,85,247,0.1)',tension:0.3,spanGaps:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false},ticks:{color:'#8b949e'}}}}});
-        if(cS)cS.destroy(); cS=new Chart(_('chtS'),{type:'line',data:{labels:labsSwp,datasets:[{label:'Balance',data:dVS,borderColor:'#10b981',tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false}}}}});
-        if(cC)cC.destroy(); cC=new Chart(_('chtC'),{type:'line',data:{labels:labsC,datasets:[{label:'Crash',data:dVC,borderColor:'#ff4d4d',tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{display:false},x:{grid:{display:false}}}}});
-    };
-
-    ['i1','i2','i3','iWait','i4','iSwp','iInfl'].forEach(id=>_(id).oninput=run);
-    document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab,.view').forEach(e=>e.classList.remove('active'));t.classList.add('active');_(t.dataset.v).classList.add('active');if(cL)cL.resize();if(cS)cS.resize();if(cC)cC.resize();});
-    run();
-</script>
+        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); calculate(); }
+        calculate();
+    </script>
 </body>
 </html>
