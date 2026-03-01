@@ -24,10 +24,12 @@
         .custom-table th { padding: 12px; font-size: 11px; text-transform: uppercase; color: #64748b; border-bottom: 1px solid #1e293b; text-align: left; }
         .custom-table td { padding: 14px 12px; font-size: 13px; border-bottom: 1px solid #1e293b; }
         .val-col { text-align: right; font-weight: 700; font-family: monospace; min-width: 160px; }
-        /* NEW STYLES FOR DEFERMENT TABLE HIGHLIGHT */
-        .defer-row { background: rgba(139, 92, 246, 0.05); }
-        .dark .defer-row { background: rgba(139, 92, 246, 0.1); }
-        .defer-text { color: #8b5cf6 !important; }
+        .defer-row { background: rgba(245, 158, 11, 0.08); }
+        .dark .defer-row { background: rgba(245, 158, 11, 0.12); }
+        .defer-text { color: #f59e0b !important; }
+        .stat-card { padding: 8px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.05); background: rgba(0,0,0,0.02); }
+        .dark .stat-card { border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); }
+        .legacy-box { background: #0f172a !important; border: 1px solid #1e293b !important; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen">
@@ -60,10 +62,43 @@
                         <div class="flex justify-between items-center"><label class="text-xs font-bold text-slate-500 uppercase">Deferment (Yrs)</label><input type="number" id="deferment" value="5" oninput="calculate()" class="input-mini"></div>
                         <input type="range" id="defer_range" min="0" max="30" value="5">
                     </div>
-                    <div class="space-y-1">
+                    <div class="space-y-1 pb-4 border-b border-zinc-800">
                         <div class="flex justify-between items-center"><label class="text-xs font-bold text-slate-500 uppercase">Returns (%)</label><input type="number" id="rate_input" value="12" oninput="calculate()" class="input-mini"></div>
                         <input type="range" id="rate_range" min="1" max="30" step="0.5" value="12">
                     </div>
+
+                    <div class="py-2 space-y-3">
+                        <h2 class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Master Strategy Snapshot</h2>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="stat-card">
+                                <p class="text-[8px] uppercase text-slate-500 font-bold">Total Invested</p>
+                                <p id="snap-invested" class="text-xs font-black text-blue-500">₹0</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="text-[8px] uppercase text-slate-500 font-bold">SIP Corpus</p>
+                                <p id="snap-sip-corpus" class="text-xs font-black text-cyan-500">₹0</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="text-[8px] uppercase text-slate-500 font-bold">Defer Growth</p>
+                                <p id="snap-defer-gain" class="text-xs font-black text-[#f59e0b]">₹0</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="text-[8px] uppercase text-slate-500 font-bold">Final Corpus</p>
+                                <p id="snap-final-corpus" class="text-xs font-black text-emerald-500">₹0</p>
+                            </div>
+                            <div class="legacy-box col-span-2 p-3 rounded-xl flex justify-between items-center shadow-inner">
+                                <div>
+                                    <p class="text-[8px] uppercase text-slate-400 font-bold">Total SWP Payout</p>
+                                    <p id="snap-total-payout" class="text-xs font-black text-emerald-400">₹0</p>
+                                </div>
+                                <div class="text-right border-l border-slate-700 pl-4">
+                                    <p class="text-[8px] uppercase text-slate-400 font-bold">Final Legacy</p>
+                                    <p id="snap-legacy" class="text-xs font-black text-white">₹0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <h2 class="text-[10px] font-black text-emerald-500 uppercase tracking-widest pt-4 border-t border-zinc-800">Distribution Phase</h2>
                     <div class="space-y-1">
                         <div class="flex justify-between items-center"><label class="text-xs font-bold text-slate-500 uppercase">Withdrawal (₹)</label><input type="number" id="swp_value" value="150000" oninput="syncSWP('amount')" class="input-mini"></div>
@@ -96,7 +131,6 @@
                         </table>
                     </div>
                 </div>
-
                 <div id="tab2" class="tab-content hidden space-y-6">
                     <div class="glass p-6 rounded-3xl h-80"><canvas id="swpChart2"></canvas></div>
                     <div class="glass p-6 rounded-3xl overflow-x-auto">
@@ -110,8 +144,7 @@
                 <div id="tab3" class="tab-content hidden space-y-12 bg-white dark:bg-black p-6 md:p-10 rounded-[2.5rem]">
                     <div class="border-b-4 border-blue-600 pb-4 flex justify-between items-end">
                         <div>
-                            <h2 class="text-3xl font-black text-blue-600 uppercase">Comprehensive Wealth Report</h2>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Projection Based on Current Market Trends</p>
+                            <h2 class="text-3xl font-black text-blue-600 uppercase">Wealth Report</h2>
                         </div>
                         <div class="text-right">
                             <p class="text-xs font-black text-red-500 uppercase italic">Education Purpose Only</p>
@@ -120,32 +153,42 @@
 
                     <section class="grid grid-cols-2 md:grid-cols-4 gap-6 bg-slate-50 dark:bg-zinc-900/50 p-6 rounded-2xl">
                         <div><p class="text-[9px] text-slate-500 uppercase font-black">Monthly SIP</p><p id="rep-sip" class="text-lg font-bold text-blue-500">₹0</p></div>
-                        <div><p class="text-[9px] text-slate-500 uppercase font-black">Tenure</p><p id="rep-tenure" class="text-lg font-bold">0 Yrs</p></div>
-                        <div><p class="text-[9px] text-slate-500 uppercase font-black">Deferment</p><p id="rep-defer" class="text-lg font-bold">0 Yrs</p></div>
+                        <div><p class="text-[9px] text-slate-500 uppercase font-black">Tenure</p><p id="rep-tenure" class="text-lg font-bold dark:text-white">0 Yrs</p></div>
+                        <div><p class="text-[9px] text-slate-500 uppercase font-black">Deferment</p><p id="rep-defer" class="text-lg font-bold dark:text-white">0 Yrs</p></div>
                         <div><p class="text-[9px] text-slate-500 uppercase font-black">Expected Returns</p><p id="rep-rate" class="text-lg font-bold text-emerald-500">0%</p></div>
                     </section>
 
                     <section>
                         <h3 class="text-xs font-black text-blue-500 mb-6 uppercase tracking-widest">Growth Phase Analysis</h3>
                         <div class="h-80 mb-8"><canvas id="sipChart3"></canvas></div>
-                        <table class="custom-table"><tbody id="sip-table-full"></tbody></table>
+                        <div class="glass p-6 rounded-3xl overflow-x-auto">
+                            <table class="custom-table">
+                                <thead><tr><th>Age (Year)</th><th>Investment</th><th class="text-right">Wealth</th></tr></thead>
+                                <tbody id="sip-table-full"></tbody>
+                            </table>
+                        </div>
                     </section>
 
                     <section>
                         <h3 class="text-xs font-black text-emerald-500 mb-6 uppercase tracking-widest">Withdrawal Phase Analysis</h3>
                         <div class="h-80 mb-8"><canvas id="swpChart3"></canvas></div>
-                        <table class="custom-table"><tbody id="swp-table-full"></tbody></table>
+                        <div class="glass p-6 rounded-3xl overflow-x-auto">
+                            <table class="custom-table">
+                                <thead><tr><th>Age (Year)</th><th>Monthly Payout</th><th class="text-right">Balance Corpus</th></tr></thead>
+                                <tbody id="swp-table-full"></tbody>
+                            </table>
+                        </div>
                     </section>
 
                     <section>
-                        <h3 class="text-xs font-black text-orange-500 mb-6 uppercase tracking-widest">Combined Lifecycle Projection</h3>
+                        <h3 class="text-xs font-black text-orange-500 mb-6 uppercase tracking-widest">Lifecycle Projection</h3>
                         <div class="h-96"><canvas id="combinedChart"></canvas></div>
                     </section>
 
-                    <div class="p-6 bg-zinc-100 dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800">
-                        <h4 class="text-[10px] font-black uppercase mb-2">Legal Disclaimer</h4>
-                        <p class="text-[10px] text-slate-500 leading-relaxed">
-                            This report is generated for educational and illustrative purposes only. Mutual fund investments are subject to market risks; read all scheme-related documents carefully.
+                    <div class="p-6 bg-slate-900 rounded-2xl border border-slate-800">
+                        <h4 class="text-[10px] font-black uppercase mb-2 text-slate-400">Legal Disclaimer</h4>
+                        <p class="text-[10px] text-slate-300 leading-relaxed">
+                            This report is generated for educational and illustrative purposes only. Mutual fund investments are subject to market risks. Always consult a certified financial advisor before making decisions.
                         </p>
                     </div>
 
@@ -164,6 +207,7 @@
 
         function setupSync(id, inputId) {
             const r = document.getElementById(id), i = document.getElementById(inputId);
+            if(!r || !i) return;
             r.addEventListener('input', () => { i.value = r.value; calculate(); });
             i.addEventListener('input', () => { r.value = i.value; calculate(); });
         }
@@ -204,12 +248,7 @@
             const monthlyW = parseFloat(document.getElementById('swp_value').value) || 0;
             const mRate = rate / 12;
 
-            document.getElementById('rep-sip').innerText = '₹' + sip.toLocaleString('en-IN');
-            document.getElementById('rep-tenure').innerText = tenure + ' Yrs';
-            document.getElementById('rep-defer').innerText = defer + ' Yrs';
-            document.getElementById('rep-rate').innerText = (rate*100) + '%';
-
-            let corpus = 0, invested = 0, sipData = [];
+            let corpus = 0, invested = 0, sipData = [], corpusAfterSip = 0;
             for (let i = 1; i <= (tenure + defer); i++) {
                 let isDefer = i > tenure;
                 if (!isDefer) {
@@ -217,6 +256,7 @@
                         corpus = (corpus + sip) * (1 + mRate);
                         invested += sip;
                     }
+                    corpusAfterSip = corpus;
                 } else {
                     corpus = corpus * (1 + rate);
                 }
@@ -224,14 +264,16 @@
             }
             finalCorpus = corpus;
 
-            let currentBal = corpus, swpData = [];
+            let currentBal = corpus, swpData = [], totalPayout = 0;
             for (let i = 1; i <= swpYears; i++) {
                 let actualOut = 0;
                 for(let m=0; m<12; m++) {
                     if(currentBal >= monthlyW) {
                         currentBal = (currentBal - monthlyW) * (1 + mRate);
                         actualOut += monthlyW;
+                        totalPayout += monthlyW;
                     } else {
+                        totalPayout += currentBal;
                         actualOut += currentBal;
                         currentBal = 0;
                     }
@@ -241,10 +283,23 @@
             }
 
             const fmt = v => '₹' + Math.round(v).toLocaleString('en-IN');
-            // Table Logic with Deferment Highlight
+            const fmtCr = v => '₹' + (v / 10000000).toFixed(2) + ' Cr';
+            
+            document.getElementById('rep-sip').innerText = fmt(sip);
+            document.getElementById('rep-tenure').innerText = tenure + ' Yrs';
+            document.getElementById('rep-defer').innerText = defer + ' Yrs';
+            document.getElementById('rep-rate').innerText = (rate*100).toFixed(1) + '%';
+
+            document.getElementById('snap-invested').innerText = fmt(invested);
+            document.getElementById('snap-sip-corpus').innerText = fmtCr(corpusAfterSip);
+            document.getElementById('snap-defer-gain').innerText = fmtCr(finalCorpus - corpusAfterSip);
+            document.getElementById('snap-final-corpus').innerText = fmtCr(finalCorpus);
+            document.getElementById('snap-total-payout').innerText = fmtCr(totalPayout);
+            document.getElementById('snap-legacy').innerText = fmtCr(currentBal);
+
             const sRows = sipData.map(d => `
                 <tr class="${d.isDefer ? 'defer-row' : ''}">
-                    <td class="${d.isDefer ? 'defer-text' : ''}">${d.age}${d.isDefer ? ' <span class="text-[9px] font-bold uppercase">(Defer)</span>' : ''}</td>
+                    <td class="${d.isDefer ? 'defer-text font-bold' : ''}">${d.age}${d.isDefer ? ' <span class="text-[9px] uppercase">(Defer)</span>' : ''}</td>
                     <td>${fmt(d.inv)}</td>
                     <td class="val-col ${d.isDefer ? 'defer-text' : 'text-blue-500'}">${fmt(d.bal)}</td>
                 </tr>`).join('');
@@ -268,37 +323,29 @@
                 if(ctx) charts[id] = new Chart(ctx, { type, data: { labels, datasets }, options: opt });
             };
 
-            // SIP Charts with Split Color for Deferment
             const sipLabels = sipData.map(d=>d.age);
             const sipGrowth = sipData.map((d, i) => i < tenure ? d.bal : null);
             const deferGrowth = sipData.map((d, i) => i >= tenure - 1 ? d.bal : null);
 
             up('sipChart1', 'line', sipLabels, [
                 { label: 'SIP Phase', data: sipGrowth, borderColor: '#3b82f6', fill: true, backgroundColor: '#3b82f611', tension: 0.3 },
-                { label: 'Deferment Phase', data: deferGrowth, borderColor: '#8b5cf6', fill: true, backgroundColor: '#8b5cf611', tension: 0.3 }
+                { label: 'Deferment Phase', data: deferGrowth, borderColor: '#f59e0b', fill: true, backgroundColor: '#f59e0b11', tension: 0.3 }
             ]);
 
             up('swpChart2', 'bar', swpData.map(d=>d.age), [{ label: 'Remaining', data: swpData.map(d=>d.bal), backgroundColor: '#10b981' }]);
-            
-            up('sipChart3', 'line', sipLabels, [
-                { label: 'Accumulation', data: sipGrowth, borderColor: '#3b82f6', fill: false },
-                { label: 'Deferment', data: deferGrowth, borderColor: '#8b5cf6', fill: false }
-            ]);
-            
+            up('sipChart3', 'line', sipLabels, [{ label: 'SIP Phase', data: sipGrowth, borderColor: '#3b82f6' }, { label: 'Deferment Phase', data: deferGrowth, borderColor: '#f59e0b' }]);
             up('swpChart3', 'bar', swpData.map(d=>d.age), [{ label: 'Corpus', data: swpData.map(d=>d.bal), backgroundColor: '#10b981' }]);
 
-            // Combined Chart with 3 segments
             const combinedLabels = [...sipLabels, ...swpData.map(d=>d.age)];
             const combSip = [...sipGrowth, ...swpData.map(()=>null)];
             const combDef = [...deferGrowth, ...swpData.map(()=>null)];
             const combSwp = [...sipData.map(()=>null), ...swpData.map(d=>d.bal)];
-            // Bridge the SWP line to the last Deferment point
             if(swpData.length > 0) combSwp[sipData.length - 1] = sipData[sipData.length-1].bal;
 
             up('combinedChart', 'line', combinedLabels, [
-                { label: 'Growth', data: combSip, borderColor: '#3b82f6', tension: 0.3 },
-                { label: 'Deferment', data: combDef, borderColor: '#8b5cf6', tension: 0.3 },
-                { label: 'SWP Phase', data: combSwp, borderColor: '#f59e0b', tension: 0.3 }
+                { label: 'SIP Phase', data: combSip, borderColor: '#3b82f6', tension: 0.3 },
+                { label: 'Deferment', data: combDef, borderColor: '#f59e0b', tension: 0.3 },
+                { label: 'SWP Phase', data: combSwp, borderColor: '#10b981', tension: 0.3 }
             ]);
         }
 
